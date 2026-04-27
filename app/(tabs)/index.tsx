@@ -1,98 +1,89 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useMemo } from 'react';
+import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import {
+  getRecentTransactions,
+  selectHydrated,
+  selectTransactions,
+  useTransactionStore,
+} from '@/src/entities/transaction';
+import { BalanceSummary } from '@/src/features/balance';
+import { TransactionRow } from '@/src/features/transaction-list';
+import { Button, Card, EmptyState, LoadingState, Screen } from '@/src/shared/ui';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const hydrated = useTransactionStore(selectHydrated);
+  const transactions = useTransactionStore(selectTransactions);
+  const recentTransactions = useMemo(() => getRecentTransactions(transactions), [transactions]);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  function openCreateTransaction() {
+    router.push('/transaction');
+  }
+
+  return (
+    <Screen>
+      <View style={styles.header}>
+        <ThemedText type="title">Overview</ThemedText>
+        <ThemedText>Track money offline and keep your daily balance in sync.</ThemedText>
+      </View>
+
+      {!hydrated ? <LoadingState label="Restoring your finance data..." /> : <BalanceSummary />}
+
+      <View style={styles.actions}>
+        <Button label="Add transaction" onPress={openCreateTransaction} style={styles.actionButton} />
+        <Button
+          label="See all"
+          onPress={() => router.push('/transactions')}
+          style={styles.actionButton}
+          variant="secondary"
+        />
+      </View>
+
+      <Card>
+        <View style={styles.sectionHeader}>
+          <ThemedText type="subtitle">Recent transactions</ThemedText>
+          <ThemedText>Latest 3 items</ThemedText>
+        </View>
+
+        {!hydrated ? (
+          <LoadingState label="Loading recent activity..." />
+        ) : recentTransactions.length === 0 ? (
+          <EmptyState
+            actionLabel="Add transaction"
+            description="Start by adding your first income or expense."
+            onAction={openCreateTransaction}
+            title="No recent activity"
+          />
+        ) : (
+          recentTransactions.map((transaction) => (
+            <TransactionRow
+              key={transaction.id}
+              onPress={() =>
+                router.push({ pathname: '/transaction', params: { id: transaction.id } })
+              }
+              transaction={transaction}
+            />
+          ))
+        )}
+      </Card>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  actionButton: {
+    flex: 1,
+  },
+  actions: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    gap: 6,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  sectionHeader: {
+    gap: 4,
   },
 });

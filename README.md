@@ -1,50 +1,76 @@
-# Welcome to your Expo app 👋
+# Finance App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Offline-first mobile finance tracker built with Expo and React Native.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- Expo Router for file-based navigation
+- Zustand for local state
+- AsyncStorage for offline persistence
+- TypeScript for the domain model and feature modules
 
-   ```bash
-   npm install
-   ```
+## MVP scope
 
-2. Start the app
+- Create expense and income transactions
+- Edit and delete existing transactions
+- Group transaction history by day
+- Show total income, total expenses, and net balance
+- Keep data available after app restart without network dependency
 
-   ```bash
-   npx expo start
-   ```
+## Route map
 
-In the output, you'll find options to open the app in a
+- `/` — Home overview
+- `/transactions` — grouped transaction list
+- `/balance` — balance summary
+- `/transaction` — add/edit modal route
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Project structure
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+app/
+   (tabs)/
+      _layout.tsx
+      index.tsx
+      transactions.tsx
+      balance.tsx
+   _layout.tsx
+   transaction.tsx
+src/
+   entities/
+      transaction/
+         model.ts
+         store.ts
+         index.ts
+   features/
+      add-transaction/
+      transaction-list/
+      balance/
+   shared/
+      ui/
+      lib/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Local development
 
-## Learn more
+1. Install dependencies.
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+2. Start Expo.
 
-## Join the community
+```bash
+npm run start
+```
 
-Join our community of developers creating universal apps.
+3. Run lint.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm run lint
+```
+
+## Notes
+
+- The transaction form stores dates as timestamps, but the current MVP edits dates through a `YYYY-MM-DD` text field.
+- The app uses local persistence only in this iteration. There is no backend sync, auth, recurring transactions, or category management UI yet.

@@ -1,0 +1,1 @@
+export * from '@/src/features/add-transaction/ui/transaction-form';

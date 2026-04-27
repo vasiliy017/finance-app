@@ -24,10 +24,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="transactions"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Transactions',
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="list.bullet.rectangle" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="balance"
+        options={{
+          title: 'Balance',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.pie.fill" color={color} />,
         }}
       />
     </Tabs>
