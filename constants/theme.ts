@@ -1,16 +1,60 @@
 import { DarkTheme, type Theme } from '@react-navigation/native';
 import { Platform } from 'react-native';
 
-const brandBackground = '#0B2E57';
-const brandPanel = '#113B68';
-const brandPanelRaised = '#184676';
-const brandBorder = '#2A5A86';
-const brandText = '#F5F7FB';
-const brandMuted = '#A9C2DD';
-const brandAccent = '#E0B84E';
-const brandAccentSoft = '#61C2B1';
-const brandSuccess = '#7ED2A1';
-const brandDanger = '#FF9085';
+export const TextColors = {
+  primary: '#DD7426',
+  brand: '#0F365B',
+  black: '#010101',
+  secondary: '#67C1B4',
+  tertiary: '#DCB85C',
+  body: '#F1F1F1',
+} as const;
+
+export const BackgroundColors = {
+  bg: '#02294E',
+  window: '#F1F1F1',
+  black: '#0B0B0B',
+  white: '#FBFCFD',
+  tertiary: '#DCB85C',
+  secondary: '#67C1B4',
+  primary: '#C87436',
+  red: '#E96161',
+  green: '#79D38C',
+  purpure: '#776B89',
+  blue: '#5999E2',
+  yellow: '#F0D463',
+  orange: '#FFA953',
+  violet: '#D63AD9',
+  lightGray: '#B4B7B9',
+  brown: '#784621',
+  shadowScreen: 'rgba(16, 16, 16, 0.32)',
+  pink: '#FE3FA8',
+  lightPurpure: '#7F61AC',
+  darkOrange: '#B76411',
+  darkBlue: '#135DB2',
+  darkGreen: '#15832D',
+  darkBrown: '#4E280B',
+} as const;
+
+export const Spacing = {
+  xs: 4,
+  s: 8,
+  m: 16,
+  l: 24,
+  xl: 32,
+  xxl: 48,
+} as const;
+
+const brandBackground = BackgroundColors.bg;
+const brandPanel = TextColors.brand;
+const brandPanelRaised = BackgroundColors.darkBlue;
+const brandBorder = BackgroundColors.darkBlue;
+const brandText = TextColors.body;
+const brandMuted = BackgroundColors.lightGray;
+const brandAccent = TextColors.tertiary;
+const brandAccentSoft = TextColors.secondary;
+const brandSuccess = BackgroundColors.green;
+const brandDanger = BackgroundColors.red;
 
 export const Colors = {
   light: {
@@ -27,7 +71,7 @@ export const Colors = {
     accentSoft: brandAccentSoft,
     success: brandSuccess,
     danger: brandDanger,
-    chrome: '#082748',
+    chrome: brandPanel,
   },
   dark: {
     text: brandText,
@@ -43,7 +87,7 @@ export const Colors = {
     accentSoft: brandAccentSoft,
     success: brandSuccess,
     danger: brandDanger,
-    chrome: '#082748',
+    chrome: brandPanel,
   },
 };
 

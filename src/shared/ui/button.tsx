@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -14,6 +15,9 @@ type ButtonProps = {
   icon?: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
+
+const buttonHorizontalPadding = Spacing.m + Spacing.xs;
+const buttonVerticalPadding = Spacing.s + Spacing.xs + Spacing.xs / 2;
 
 export function Button({
   label,
@@ -38,7 +42,7 @@ export function Button({
           ? { backgroundColor: 'transparent', borderColor: 'transparent' }
           : { backgroundColor: panel, borderColor: border };
 
-  const labelColor = variant === 'primary' ? '#102844' : variant === 'danger' ? '#FFFFFF' : text;
+  const labelColor = variant === 'primary' ? TextColors.brand : variant === 'danger' ? BackgroundColors.white : text;
 
   return (
     <Pressable
@@ -64,12 +68,12 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.s,
     justifyContent: 'center',
     minHeight: 56,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    shadowColor: '#03162B',
+    paddingHorizontal: buttonHorizontalPadding,
+    paddingVertical: buttonVerticalPadding,
+    shadowColor: BackgroundColors.black,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
     shadowRadius: 14,

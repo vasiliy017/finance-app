@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
 import { TransactionList } from '@/src/features/transaction-list';
 import { Button, Screen } from '@/src/shared/ui';
 
@@ -31,12 +32,12 @@ export default function TransactionsScreen() {
 const styles = StyleSheet.create({
   headerCopy: {
     flex: 1,
-    gap: 6,
+    gap: Spacing.s - Spacing.xs / 2,
   },
   headerRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
   },
   listContainer: {
     flex: 1,

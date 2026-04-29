@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors, Spacing } from '@/constants/theme';
 import { formatCurrency } from '@/src/shared/lib/currency';
 import { formatDayLabel } from '@/src/shared/lib/date';
 
@@ -26,14 +27,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: Spacing.s + Spacing.xs / 2,
   },
   negative: {
-    color: '#C0392B',
+    color: Colors.dark.danger,
     fontWeight: '600',
   },
   positive: {
-    color: '#1F8A4D',
+    color: Colors.dark.success,
     fontWeight: '600',
   },
 });

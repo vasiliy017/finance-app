@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
 import type { Transaction } from '@/src/entities/transaction';
 import {
   type TransactionFormMode,
@@ -19,6 +20,12 @@ type TransactionFormProps = {
   onCancel: () => void;
   onCompleted: () => void;
 };
+
+const compactGap = Spacing.s - Spacing.xs / 2;
+const fieldGap = Spacing.s + Spacing.xs / 2;
+const horizontalInset = Spacing.m + Spacing.xs / 2;
+const sectionGap = Spacing.l - Spacing.xs / 2;
+const verticalInset = Spacing.m - Spacing.xs / 2;
 
 export function TransactionForm({ mode, transaction, onCancel, onCompleted }: TransactionFormProps) {
   const {
@@ -40,7 +47,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
     <Screen contentContainerStyle={styles.content}>
       <View style={styles.topRow}>
         <Pressable accessibilityRole="button" onPress={onCancel} style={styles.backButton}>
-          <MaterialIcons color="#102844" name="arrow-back-ios-new" size={20} />
+          <MaterialIcons color={TextColors.brand} name="arrow-back-ios-new" size={20} />
         </Pressable>
 
         <View style={styles.titlePill}>
@@ -59,7 +66,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
             keyboardType="decimal-pad"
             onChangeText={(value) => setField('amount', value)}
             placeholder="0"
-            placeholderTextColor="#506B86"
+            placeholderTextColor={Colors.dark.muted}
             style={styles.amountInput}
             value={values.amount}
           />
@@ -88,7 +95,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
         <TextInput
           onChangeText={(value) => setField('note', value)}
           placeholder="Dentistry"
-          placeholderTextColor="#506B86"
+          placeholderTextColor={Colors.dark.muted}
           style={styles.commentInput}
           value={values.note}
         />
@@ -101,14 +108,14 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
             <View key={photoUri} style={[styles.photoTile, styles.photoTileFilled]}>
               <Image contentFit="cover" source={{ uri: photoUri }} style={styles.photoImage} />
               <Pressable onPress={() => handleRemovePhoto(photoUri)} style={styles.removePhotoButton}>
-                <MaterialIcons color="#102844" name="close" size={16} />
+                <MaterialIcons color={TextColors.brand} name="close" size={16} />
               </Pressable>
             </View>
           ))}
 
           {Array.from({ length: emptySlots }).map((_, index) => (
             <Pressable key={`empty-${index}`} onPress={handleAddPhoto} style={styles.photoTile}>
-              <MaterialIcons color="#FFFFFF" name="add" size={34} />
+              <MaterialIcons color={BackgroundColors.white} name="add" size={34} />
             </Pressable>
           ))}
         </View>
@@ -131,21 +138,21 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
 const styles = StyleSheet.create({
   amountField: {
     alignItems: 'center',
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
     borderRadius: 22,
     flexDirection: 'row',
-    gap: 6,
+    gap: compactGap,
     justifyContent: 'center',
     minHeight: 84,
-    paddingHorizontal: 18,
+    paddingHorizontal: horizontalInset,
     width: 162,
   },
   amountFieldError: {
-    borderColor: '#FF9085',
+    borderColor: BackgroundColors.red,
     borderWidth: 2,
   },
   amountInput: {
-    color: '#214C79',
+    color: TextColors.brand,
     fontSize: 32,
     fontWeight: '600',
     minWidth: 72,
@@ -153,46 +160,46 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   amountPrefix: {
-    color: '#214C79',
+    color: TextColors.brand,
     fontSize: 34,
     fontWeight: '700',
     lineHeight: 40,
   },
   amountSection: {
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.s,
   },
   backButton: {
     alignItems: 'center',
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
     borderRadius: 20,
     height: 44,
     justifyContent: 'center',
     width: 44,
   },
   commentInput: {
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
     borderRadius: 20,
-    color: '#102844',
+    color: TextColors.brand,
     fontSize: 16,
     minHeight: 52,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: Spacing.m,
+    paddingVertical: verticalInset,
   },
   content: {
-    gap: 22,
+    gap: sectionGap,
   },
   errorText: {
-    color: '#FF9085',
+    color: BackgroundColors.red,
     fontSize: 13,
     lineHeight: 18,
   },
   fieldGroup: {
-    gap: 10,
+    gap: fieldGap,
   },
   photoGrid: {
     flexDirection: 'row',
-    gap: 16,
+    gap: Spacing.m,
     justifyContent: 'space-between',
     minHeight: 112,
   },
@@ -203,7 +210,7 @@ const styles = StyleSheet.create({
   },
   photoTile: {
     alignItems: 'center',
-    backgroundColor: '#B8BDC3',
+    backgroundColor: BackgroundColors.lightGray,
     borderRadius: 26,
     height: 112,
     justifyContent: 'center',
@@ -212,17 +219,17 @@ const styles = StyleSheet.create({
     width: 112,
   },
   photoTileFilled: {
-    backgroundColor: '#E8EBEF',
+    backgroundColor: BackgroundColors.window,
   },
   removePhotoButton: {
     alignItems: 'center',
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
     borderRadius: 12,
     height: 24,
     justifyContent: 'center',
     position: 'absolute',
-    right: 8,
-    top: 8,
+    right: Spacing.s,
+    top: Spacing.s,
     width: 24,
   },
   submitButton: {
@@ -231,21 +238,21 @@ const styles = StyleSheet.create({
     width: '72%',
   },
   titlePill: {
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
     borderRadius: 20,
     flex: 1,
     justifyContent: 'center',
     minHeight: 44,
-    paddingHorizontal: 18,
+    paddingHorizontal: horizontalInset,
   },
   titleText: {
-    color: '#102844',
+    color: TextColors.brand,
     fontSize: 16,
     lineHeight: 20,
   },
   topRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
   },
 });

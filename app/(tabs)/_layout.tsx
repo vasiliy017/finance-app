@@ -1,10 +1,13 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { StyleSheet } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
+import { BackgroundColors, Colors, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const tabBarBorderColor = `${BackgroundColors.lightGray}24`;
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -19,14 +22,15 @@ export default function TabLayout() {
         sceneStyle: { backgroundColor: Colors[colorScheme ?? 'light'].background },
         tabBarStyle: {
           backgroundColor: Colors[colorScheme ?? 'light'].chrome,
-          borderTopWidth: 0,
+          borderTopColor: tabBarBorderColor,
+          borderTopWidth: StyleSheet.hairlineWidth,
           elevation: 0,
-          height: 74,
-          paddingBottom: 12,
-          paddingTop: 10,
+          height: 56,
+          paddingBottom: Spacing.xs / 2,
+          paddingTop: Spacing.xs / 2,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 9,
           fontWeight: '700',
         },
       }}>
@@ -34,7 +38,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -42,7 +46,7 @@ export default function TabLayout() {
         options={{
           title: 'Transactions',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="list.bullet.rectangle" color={color} />
+            <IconSymbol size={24} name="list.bullet.rectangle" color={color} />
           ),
         }}
       />
@@ -50,7 +54,7 @@ export default function TabLayout() {
         name="balance"
         options={{
           title: 'Balance',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.pie.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.pie.fill" color={color} />,
         }}
       />
     </Tabs>

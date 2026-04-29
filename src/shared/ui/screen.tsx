@@ -3,6 +3,7 @@ import type { ScrollViewProps, StyleProp, ViewStyle } from 'react-native';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Spacing } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 type ScreenProps = PropsWithChildren<{
@@ -10,6 +11,11 @@ type ScreenProps = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: ScrollViewProps['contentContainerStyle'];
 }>;
+
+const screenGap = Spacing.m + Spacing.xs;
+const screenHorizontalInset = Spacing.m;
+const screenBottomInset = Spacing.xl + Spacing.s;
+const screenTopInset = Spacing.m + Spacing.xs / 2;
 
 export function Screen({ children, scroll = true, style, contentContainerStyle }: ScreenProps) {
   const backgroundColor = useThemeColor({}, 'background');
@@ -42,9 +48,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    gap: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 18,
+    gap: screenGap,
+    paddingHorizontal: screenHorizontalInset,
+    paddingBottom: screenBottomInset,
+    paddingTop: screenTopInset,
   },
 });

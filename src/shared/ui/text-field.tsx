@@ -2,6 +2,7 @@ import type { TextInputProps } from 'react-native';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 type TextFieldProps = TextInputProps & {
@@ -9,6 +10,10 @@ type TextFieldProps = TextInputProps & {
   error?: string;
   hint?: string;
 };
+
+const fieldContainerGap = Spacing.s + Spacing.xs / 2;
+const fieldHorizontalPadding = Spacing.m + Spacing.xs / 2;
+const fieldVerticalPadding = Spacing.s + Spacing.xs + Spacing.xs / 2;
 
 export function TextField({ label, error, hint, style, ...props }: TextFieldProps) {
   const textColor = useThemeColor({}, 'text');
@@ -33,7 +38,7 @@ export function TextField({ label, error, hint, style, ...props }: TextFieldProp
         ]}
         {...props}
       />
-      {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}
+      {error ? <ThemedText style={[styles.error, { color: danger }]}>{error}</ThemedText> : null}
       {!error && hint ? <ThemedText style={styles.hint}>{hint}</ThemedText> : null}
     </View>
   );
@@ -41,10 +46,9 @@ export function TextField({ label, error, hint, style, ...props }: TextFieldProp
 
 const styles = StyleSheet.create({
   container: {
-    gap: 10,
+    gap: fieldContainerGap,
   },
   error: {
-    color: '#FF9085',
     fontSize: 13,
     lineHeight: 18,
   },
@@ -58,7 +62,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 16,
     minHeight: 58,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: fieldHorizontalPadding,
+    paddingVertical: fieldVerticalPadding,
   },
 });

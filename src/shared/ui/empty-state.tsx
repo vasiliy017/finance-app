@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
 import { Button } from '@/src/shared/ui/button';
 import { Card } from '@/src/shared/ui/card';
 
@@ -25,6 +26,6 @@ export function EmptyState({ title, description, actionLabel, onAction }: EmptyS
 
 const styles = StyleSheet.create({
   content: {
-    gap: 6,
+    gap: Spacing.s - Spacing.xs / 2,
   },
 });

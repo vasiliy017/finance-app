@@ -2,34 +2,135 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Circle, G } from 'react-native-svg';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
 import {
   calculateCategoryTotals,
   calculateTransactionTotals,
   getCategoryDefinition,
-  getRecentTransactions,
   selectHydrated,
   selectTransactions,
   type TransactionType,
   useTransactionStore,
 } from '@/src/entities/transaction';
-import { TransactionRow } from '@/src/features/transaction-list';
 import { formatCurrency } from '@/src/shared/lib/currency';
-import { formatTransactionDate } from '@/src/shared/lib/date';
-import { Button, Card, EmptyState, LoadingState, Screen } from '@/src/shared/ui';
+import { Card, EmptyState, LoadingState, Screen } from '@/src/shared/ui';
 
 const PERIOD_LABELS = ['Day', 'Week', 'Month', 'Year', 'Date'] as const;
+const DONUT_SIZE = 184;
+const DONUT_STROKE = 22;
+const DONUT_RADIUS = (DONUT_SIZE - DONUT_STROKE) / 2;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
+const CHART_PALETTE = [
+  BackgroundColors.purpure,
+  BackgroundColors.red,
+  BackgroundColors.yellow,
+  BackgroundColors.brown,
+  BackgroundColors.blue,
+] as const;
+const DONUT_TRACK_COLOR = BackgroundColors.lightGray;
+const compactGap = Spacing.s - Spacing.xs / 2;
+const fieldGap = Spacing.s + Spacing.xs / 2;
+const sectionGap = Spacing.m - Spacing.xs;
+const chipInset = Spacing.m - Spacing.xs;
+const extendedInset = Spacing.xxl + Spacing.s;
+
+type ChartSegment = {
+  color: string;
+  value: number;
+};
+
+function formatDashboardDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+  });
+}
+
+function DashboardDonut({ amountLabel, segments }: { amountLabel: string; segments: ChartSegment[] }) {
+  const resolvedSegments = segments.length > 0 ? segments : [{ color: DONUT_TRACK_COLOR, value: 1 }];
+  const total = resolvedSegments.reduce((sum, segment) => sum + segment.value, 0);
+  let accumulated = 0;
+
+  return (
+    <View style={styles.chartShell}>
+      <Svg height={DONUT_SIZE} width={DONUT_SIZE}>
+        <Circle
+          cx={DONUT_SIZE / 2}
+          cy={DONUT_SIZE / 2}
+          fill="none"
+          r={DONUT_RADIUS}
+          stroke={DONUT_TRACK_COLOR}
+          strokeWidth={DONUT_STROKE}
+        />
+        {resolvedSegments.map((segment, index) => {
+          const rawLength = (segment.value / total) * DONUT_CIRCUMFERENCE;
+          const visibleLength = resolvedSegments.length === 1 ? rawLength : Math.max(0, rawLength - 6);
+          const rotation = (accumulated / total) * 360 - 90;
+
+          accumulated += segment.value;
+
+          return (
+            <G
+              key={`${segment.color}-${index}`}
+              originX={DONUT_SIZE / 2}
+              originY={DONUT_SIZE / 2}
+              rotation={rotation}>
+              <Circle
+                cx={DONUT_SIZE / 2}
+                cy={DONUT_SIZE / 2}
+                fill="none"
+                r={DONUT_RADIUS}
+                stroke={segment.color}
+                strokeDasharray={`${visibleLength} ${DONUT_CIRCUMFERENCE}`}
+                strokeLinecap="round"
+                strokeWidth={DONUT_STROKE}
+              />
+            </G>
+          );
+        })}
+      </Svg>
+
+      <View style={styles.chartCenter}>
+        <ThemedText style={styles.chartValue}>{amountLabel}</ThemedText>
+      </View>
+    </View>
+  );
+}
 
 export default function HomeScreen() {
   const hydrated = useTransactionStore(selectHydrated);
   const transactions = useTransactionStore(selectTransactions);
   const [activeType, setActiveType] = useState<TransactionType>('expense');
-  const recentTransactions = useMemo(() => getRecentTransactions(transactions), [transactions]);
   const totals = useMemo(() => calculateTransactionTotals(transactions), [transactions]);
-  const categoryTotals = useMemo(
-    () => calculateCategoryTotals(transactions, activeType).slice(0, 4),
+  const allCategoryTotals = useMemo(
+    () => calculateCategoryTotals(transactions, activeType),
     [activeType, transactions]
+  );
+  const categoryTotals = useMemo(() => allCategoryTotals.slice(0, 4), [allCategoryTotals]);
+
+  const chartSegments = useMemo(
+    () => {
+      const topSegments = categoryTotals.map((item, index) => ({
+        color: CHART_PALETTE[index] ?? getCategoryDefinition(item.category)?.color ?? BackgroundColors.blue,
+        value: item.total,
+      }));
+      const remainingTotal = allCategoryTotals
+        .slice(categoryTotals.length)
+        .reduce((sum, item) => sum + item.total, 0);
+
+      if (remainingTotal > 0) {
+        topSegments.push({
+          color: CHART_PALETTE[topSegments.length] ?? BackgroundColors.blue,
+          value: remainingTotal,
+        });
+      }
+
+      return topSegments;
+    },
+    [allCategoryTotals, categoryTotals]
   );
 
   const featuredTotal = activeType === 'expense' ? totals.expense : totals.income;
@@ -38,29 +139,33 @@ export default function HomeScreen() {
     router.push('/transaction');
   }
 
+  function openTransactions() {
+    router.push('/(tabs)/transactions');
+  }
+
   return (
     <Screen>
       <View style={styles.heroHeader}>
-        <View style={styles.totalWrap}>
-          <View style={styles.titleRow}>
-            <MaterialIcons color="#E0B84E" name="lightbulb-outline" size={24} />
-            <ThemedText type="subtitle">Total</ThemedText>
+        <View style={styles.heroTopRow}>
+          <View style={styles.headerIconButton}>
+            <MaterialIcons color={TextColors.body} name="menu" size={28} />
           </View>
-          <ThemedText type="title" style={styles.totalAmount}>
-            {formatCurrency(totals.balance)}
-          </ThemedText>
+
+          <View style={styles.totalWrap}>
+            <View style={styles.titleRow}>
+              <MaterialIcons color={TextColors.tertiary} name="lightbulb-outline" size={24} />
+              <ThemedText type="subtitle">Total</ThemedText>
+            </View>
+            <ThemedText adjustsFontSizeToFit minimumFontScale={0.75} numberOfLines={1} type="title" style={styles.totalAmount}>
+              {formatCurrency(totals.balance)}
+            </ThemedText>
+          </View>
+
+          <Pressable accessibilityRole="button" onPress={openTransactions} style={styles.headerIconButton}>
+            <MaterialIcons color={TextColors.body} name="receipt-long" size={26} />
+          </Pressable>
         </View>
 
-        <View style={styles.quickMetrics}>
-          <View style={styles.metricChip}>
-            <ThemedText style={styles.metricLabel}>Income</ThemedText>
-            <ThemedText type="defaultSemiBold">{formatCurrency(totals.income)}</ThemedText>
-          </View>
-          <View style={styles.metricChip}>
-            <ThemedText style={styles.metricLabel}>Expense</ThemedText>
-            <ThemedText type="defaultSemiBold">{formatCurrency(totals.expense)}</ThemedText>
-          </View>
-        </View>
       </View>
 
       <View style={styles.typeTabs}>
@@ -88,20 +193,14 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.dateRow}>
-          <MaterialIcons color="#A9C2DD" name="chevron-left" size={28} />
+          <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
           <ThemedText type="subtitle" style={styles.dateLabel}>
-            {formatTransactionDate(Date.now())}
+            {formatDashboardDate(Date.now())}
           </ThemedText>
-          <MaterialIcons color="#A9C2DD" name="chevron-right" size={28} />
+          <MaterialIcons color={TextColors.brand} name="chevron-right" size={28} />
         </View>
 
-        <View style={styles.chartShell}>
-          <View style={styles.ringOuter}>
-            <View style={styles.ringInner}>
-              <ThemedText style={styles.chartValue}>{formatCurrency(featuredTotal)}</ThemedText>
-            </View>
-          </View>
-        </View>
+        <DashboardDonut amountLabel={formatCurrency(featuredTotal)} segments={chartSegments} />
 
         {!hydrated ? (
           <LoadingState label="Calculating category totals..." />
@@ -112,104 +211,80 @@ export default function HomeScreen() {
             onAction={openCreateTransaction}
             title="No category data yet"
           />
-        ) : (
-          <View style={styles.categoryList}>
-            {categoryTotals.map((item) => {
-              const category = getCategoryDefinition(item.category);
+        ) : null}
 
-              return (
-                <View key={item.category} style={styles.categoryRow}>
+        <Pressable accessibilityRole="button" onPress={openCreateTransaction} style={styles.floatingAddButton}>
+          <MaterialIcons color={BackgroundColors.white} name="add" size={28} />
+        </Pressable>
+      </Card>
+
+      {hydrated && categoryTotals.length > 0 ? (
+        <View style={styles.summaryList}>
+          {categoryTotals.map((item) => {
+            const category = getCategoryDefinition(item.category);
+
+            return (
+              <View key={item.category} style={styles.summaryRowCard}>
+                <View style={styles.categoryRow}>
                   <View style={styles.categoryLeading}>
-                    <View style={[styles.categoryBadge, { backgroundColor: category?.color ?? '#5D96E6' }]}>
+                    <View style={[styles.categoryBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}> 
                       <MaterialIcons
-                        color="#FFFFFF"
+                        color={BackgroundColors.white}
                         name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'}
                         size={20}
                       />
                     </View>
-                    <ThemedText type="defaultSemiBold">{category?.label ?? item.category}</ThemedText>
+                    <ThemedText type="defaultSemiBold" style={styles.categoryText}>
+                      {category?.label ?? item.category}
+                    </ThemedText>
                   </View>
-                  <ThemedText type="defaultSemiBold">{formatCurrency(item.total)}</ThemedText>
+                  <ThemedText type="defaultSemiBold" style={styles.categoryValue}>
+                    {formatCurrency(item.total)}
+                  </ThemedText>
                 </View>
-              );
-            })}
-          </View>
-        )}
-
-        <Pressable accessibilityRole="button" onPress={openCreateTransaction} style={styles.floatingAddButton}>
-          <MaterialIcons color="#0B2E57" name="add" size={28} />
-        </Pressable>
-      </Card>
-
-      <View style={styles.actions}>
-        <Button label="Add transaction" onPress={openCreateTransaction} style={styles.actionButton} />
-        <Button
-          label="See all"
-          onPress={() => router.push('/transactions')}
-          style={styles.actionButton}
-          variant="secondary"
-        />
-      </View>
-
-      <Card>
-        <View style={styles.sectionHeader}>
-          <ThemedText type="subtitle">Recent transactions</ThemedText>
-          <ThemedText style={styles.sectionCopy}>Latest 3 items</ThemedText>
+              </View>
+            );
+          })}
         </View>
+      ) : null}
 
-        {!hydrated ? (
-          <LoadingState label="Loading recent activity..." />
-        ) : recentTransactions.length === 0 ? (
-          <EmptyState
-            actionLabel="Add transaction"
-            description="Start by adding your first income or expense."
-            onAction={openCreateTransaction}
-            title="No recent activity"
-          />
-        ) : (
-          recentTransactions.map((transaction) => (
-            <TransactionRow
-              key={transaction.id}
-              onPress={() =>
-                router.push({ pathname: '/transaction', params: { id: transaction.id } })
-              }
-              transaction={transaction}
-            />
-          ))
-        )}
-      </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
   analyticsCard: {
+    backgroundColor: BackgroundColors.window,
+    borderColor: BackgroundColors.white,
     overflow: 'hidden',
-    paddingBottom: 28,
+    paddingBottom: compactGap,
     position: 'relative',
   },
   categoryBadge: {
     alignItems: 'center',
-    borderRadius: 20,
-    height: 40,
+    borderRadius: 18,
+    height: 36,
     justifyContent: 'center',
-    width: 40,
+    width: 36,
   },
   categoryLeading: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 12,
+    gap: fieldGap,
+  },
+  categoryText: {
+    color: TextColors.brand,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  categoryValue: {
+    color: TextColors.brand,
+    fontSize: 15,
+    lineHeight: 20,
   },
   categoryList: {
-    gap: 12,
-    paddingRight: 56,
+    gap: sectionGap,
+    paddingRight: extendedInset,
   },
   categoryRow: {
     alignItems: 'center',
@@ -218,68 +293,81 @@ const styles = StyleSheet.create({
   },
   chartShell: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingBottom: compactGap,
+    paddingTop: 0,
+    position: 'relative',
+  },
+  chartCenter: {
+    alignItems: 'center',
+    backgroundColor: BackgroundColors.window,
+    borderRadius: 68,
+    height: 136,
+    justifyContent: 'center',
+    position: 'absolute',
+    width: 136,
   },
   chartValue: {
-    color: '#E0B84E',
-    fontSize: 24,
+    color: TextColors.tertiary,
+    fontSize: 22,
     fontWeight: '700',
-    lineHeight: 30,
+    includeFontPadding: false,
+    lineHeight: 28,
     textAlign: 'center',
+    textAlignVertical: 'center',
+    transform: [{ translateY: 1 }],
   },
   dateLabel: {
+    color: TextColors.brand,
     textDecorationLine: 'underline',
   },
   dateRow: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: Spacing.xs / 2,
   },
   floatingAddButton: {
     alignItems: 'center',
-    backgroundColor: '#E0B84E',
-    borderRadius: 24,
-    bottom: 18,
-    height: 48,
+    backgroundColor: TextColors.tertiary,
+    borderRadius: 22,
+    bottom: 28,
+    height: 44,
     justifyContent: 'center',
     position: 'absolute',
-    right: 18,
-    width: 48,
+    right: 14,
+    width: 44,
   },
   heroHeader: {
     alignItems: 'center',
-    gap: 18,
+    gap: sectionGap,
   },
-  metricChip: {
-    backgroundColor: '#113B68',
-    borderColor: '#2A5A86',
-    borderRadius: 22,
-    borderWidth: 1,
-    flex: 1,
-    gap: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  heroTopRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: Spacing.s,
+    width: '100%',
   },
-  metricLabel: {
-    color: '#A9C2DD',
-    fontSize: 13,
-    lineHeight: 18,
+  headerIconButton: {
+    alignItems: 'center',
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
   },
   periodChip: {
     borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: chipInset,
+    paddingVertical: Spacing.s,
   },
   periodChipActive: {
-    backgroundColor: '#E0B84E',
+    backgroundColor: TextColors.tertiary,
   },
   periodChipText: {
-    color: '#A9C2DD',
+    color: TextColors.brand,
     fontSize: 13,
     lineHeight: 18,
   },
   periodChipTextActive: {
-    color: '#0B2E57',
+    color: TextColors.brand,
     fontSize: 13,
     fontWeight: '700',
     lineHeight: 18,
@@ -287,67 +375,57 @@ const styles = StyleSheet.create({
   periodRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: Spacing.s,
+    marginBottom: Spacing.xs / 2,
   },
-  quickMetrics: {
-    flexDirection: 'row',
-    gap: 12,
+  summaryList: {
+    gap: Spacing.xs,
+    marginTop: 0,
   },
-  ringInner: {
-    alignItems: 'center',
-    backgroundColor: '#113B68',
-    borderRadius: 72,
-    height: 144,
+  summaryRowCard: {
+    backgroundColor: BackgroundColors.window,
+    borderRadius: 12,
+    height: 56,
     justifyContent: 'center',
-    width: 144,
-  },
-  ringOuter: {
-    alignItems: 'center',
-    backgroundColor: '#5D96E6',
-    borderRadius: 96,
-    height: 192,
-    justifyContent: 'center',
-    width: 192,
-  },
-  sectionCopy: {
-    color: '#A9C2DD',
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  sectionHeader: {
-    gap: 4,
+    paddingHorizontal: Spacing.m,
+    paddingVertical: 0,
   },
   titleRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.s,
   },
   totalAmount: {
-    color: '#E0B84E',
+    color: TextColors.tertiary,
+    fontSize: 29,
+    letterSpacing: 0.2,
+    lineHeight: 32,
     textAlign: 'center',
   },
   totalWrap: {
     alignItems: 'center',
-    gap: 8,
+    flex: 1,
+    gap: Spacing.xs,
   },
   typeTab: {
-    paddingBottom: 8,
+    paddingBottom: compactGap,
   },
   typeTabActive: {
-    color: '#61C2B1',
+    color: TextColors.secondary,
     fontSize: 18,
     fontWeight: '700',
     lineHeight: 24,
     textDecorationLine: 'underline',
   },
   typeTabIdle: {
-    color: '#F5F7FB',
+    color: TextColors.body,
     fontSize: 18,
     lineHeight: 24,
   },
   typeTabs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 6,
+    marginBottom: 0,
+    paddingHorizontal: 0,
   },
 });

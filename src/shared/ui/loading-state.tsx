@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Card } from '@/src/shared/ui/card';
 
@@ -24,7 +25,7 @@ export function LoadingState({ label = 'Loading your data...' }: LoadingStatePro
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
     justifyContent: 'center',
     minHeight: 140,
   },

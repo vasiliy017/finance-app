@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Colors, Spacing } from '@/constants/theme';
 import {
   calculateTransactionTotals,
   selectTransactions,
@@ -42,23 +43,23 @@ export function BalanceSummary() {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
   },
   grid: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
   },
   heroCard: {
-    gap: 8,
+    gap: Spacing.s,
   },
   metricCard: {
     flex: 1,
-    gap: 6,
+    gap: Spacing.s - Spacing.xs / 2,
   },
   negative: {
-    color: '#C0392B',
+    color: Colors.dark.danger,
   },
   positive: {
-    color: '#1F8A4D',
+    color: Colors.dark.success,
   },
 });

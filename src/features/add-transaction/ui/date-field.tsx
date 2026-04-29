@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
 import { formatDateInput, parseDateInput } from '@/src/shared/lib/date';
 
 type DateFieldProps = {
@@ -11,6 +12,10 @@ type DateFieldProps = {
   error?: string;
   onChange: (value: string) => void;
 };
+
+const fieldGap = Spacing.s + Spacing.xs / 2;
+const chipInset = Spacing.m - Spacing.xs;
+const panelInset = Spacing.m - Spacing.xs / 2;
 
 function shiftDay(value: string, delta: number) {
   const base = parseDateInput(value) ?? Date.now();
@@ -78,7 +83,7 @@ export function DateField({ value, error, onChange }: DateFieldProps) {
         })}
 
         <Pressable onPress={() => setExpanded((current) => !current)} style={styles.calendarButton}>
-          <MaterialIcons color="#F5F7FB" name="calendar-today" size={24} />
+          <MaterialIcons color={TextColors.body} name="calendar-today" size={24} />
         </Pressable>
       </View>
 
@@ -92,7 +97,7 @@ export function DateField({ value, error, onChange }: DateFieldProps) {
               keyboardType="numbers-and-punctuation"
               onChangeText={onChange}
               placeholder="2026-04-26"
-              placeholderTextColor="#A9C2DD"
+              placeholderTextColor={Colors.dark.muted}
               style={styles.input}
               value={value}
             />
@@ -101,11 +106,11 @@ export function DateField({ value, error, onChange }: DateFieldProps) {
           <View style={styles.pickerWrap}>
             <ThemedText type="defaultSemiBold">Select date</ThemedText>
             <DateTimePicker
-              accentColor="#E0B84E"
+              accentColor={TextColors.tertiary}
               display={Platform.OS === 'ios' ? 'inline' : 'default'}
               mode="date"
               onChange={handleNativeChange}
-              textColor="#F5F7FB"
+              textColor={TextColors.body}
               value={selectedDate}
             />
           </View>
@@ -119,10 +124,10 @@ export function DateField({ value, error, onChange }: DateFieldProps) {
 
 const styles = StyleSheet.create({
   activeChip: {
-    backgroundColor: '#F5F7FB',
+    backgroundColor: BackgroundColors.window,
   },
   activeChipText: {
-    color: '#61C2B1',
+    color: TextColors.secondary,
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 20,
@@ -138,45 +143,45 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     minWidth: 68,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: chipInset,
+    paddingVertical: fieldGap,
   },
   chipText: {
-    color: '#00A79D',
+    color: TextColors.secondary,
     fontSize: 16,
     fontWeight: '600',
     lineHeight: 20,
   },
   container: {
-    gap: 10,
+    gap: fieldGap,
   },
   editorWrap: {
-    gap: 8,
+    gap: Spacing.s,
   },
   error: {
-    color: '#FF9085',
+    color: BackgroundColors.red,
     fontSize: 13,
     lineHeight: 18,
   },
   input: {
-    backgroundColor: '#113B68',
-    borderColor: '#2A5A86',
+    backgroundColor: Colors.dark.panel,
+    borderColor: Colors.dark.border,
     borderRadius: 20,
     borderWidth: 1,
-    color: '#F5F7FB',
+    color: TextColors.body,
     fontSize: 16,
     minHeight: 52,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.m,
+    paddingVertical: chipInset,
   },
   pickerWrap: {
-    backgroundColor: '#113B68',
-    borderColor: '#2A5A86',
+    backgroundColor: Colors.dark.panel,
+    borderColor: Colors.dark.border,
     borderRadius: 20,
     borderWidth: 1,
-    gap: 10,
+    gap: fieldGap,
     overflow: 'hidden',
-    padding: 14,
+    padding: panelInset,
   },
   row: {
     alignItems: 'center',

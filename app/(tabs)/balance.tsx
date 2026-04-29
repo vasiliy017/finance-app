@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { Spacing } from '@/constants/theme';
 import { selectHydrated, useTransactionStore } from '@/src/entities/transaction';
 import { BalanceSummary } from '@/src/features/balance';
 import { Button, LoadingState, Screen } from '@/src/shared/ui';
@@ -25,6 +26,6 @@ export default function BalanceScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    gap: 6,
+    gap: Spacing.s - Spacing.xs / 2,
   },
 });

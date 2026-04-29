@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { SectionList, StyleSheet } from 'react-native';
 
+import { Spacing } from '@/constants/theme';
 import {
   groupTransactionsByDay,
   selectHydrated,
@@ -56,7 +57,7 @@ export function TransactionList({ onAddTransaction, onSelectTransaction }: Trans
 
 const styles = StyleSheet.create({
   content: {
-    paddingBottom: 12,
+    paddingBottom: Spacing.m - Spacing.xs,
   },
   list: {
     flex: 1,

@@ -1,8 +1,8 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
 import { getCategoryDefinition, type Transaction } from '@/src/entities/transaction';
 import { formatCurrency } from '@/src/shared/lib/currency';
 import { formatTransactionDate } from '@/src/shared/lib/date';
@@ -12,42 +12,31 @@ type TransactionRowProps = {
   onPress?: () => void;
 };
 
+const compactGap = Spacing.s - Spacing.xs / 2;
+const cardInset = Spacing.m + Spacing.xs / 2;
+const cardBlockInset = Spacing.m - Spacing.xs / 2;
+const sectionInset = Spacing.m - Spacing.xs;
+const tightGap = Spacing.xs / 2;
+
 export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
   const category = getCategoryDefinition(transaction.category);
   const amountColor = transaction.type === 'income' ? styles.positive : styles.negative;
-  const previewPhotos = transaction.photos?.slice(0, 2) ?? [];
-  const remainingPhotos = Math.max(0, (transaction.photos?.length ?? 0) - previewPhotos.length);
 
   return (
     <Pressable onPress={onPress} style={styles.pressable}>
       <View style={styles.card}>
         <View style={styles.mainRow}>
           <View style={styles.leadingGroup}>
-            <View style={[styles.iconBadge, { backgroundColor: category?.color ?? '#5D96E6' }]}>
-              <MaterialIcons color="#FFFFFF" name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'} size={22} />
+            <View style={[styles.iconBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}>
+              <MaterialIcons color={BackgroundColors.white} name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'} size={22} />
             </View>
             <View style={styles.textGroup}>
-              <ThemedText type="defaultSemiBold">{category?.label ?? transaction.category}</ThemedText>
+              <ThemedText type="defaultSemiBold" style={styles.labelText}>
+                {category?.label ?? transaction.category}
+              </ThemedText>
               <ThemedText style={styles.metaText}>
                 {transaction.note?.trim() || formatTransactionDate(transaction.date)}
               </ThemedText>
-              {previewPhotos.length > 0 ? (
-                <View style={styles.photoPreviewRow}>
-                  {previewPhotos.map((photoUri) => (
-                    <Image
-                      key={photoUri}
-                      contentFit="cover"
-                      source={{ uri: photoUri }}
-                      style={styles.photoPreview}
-                    />
-                  ))}
-                  {remainingPhotos > 0 ? (
-                    <View style={styles.photoCountBadge}>
-                      <ThemedText style={styles.photoCountText}>+{remainingPhotos}</ThemedText>
-                    </View>
-                  ) : null}
-                </View>
-              ) : null}
             </View>
           </View>
           <View style={styles.amountGroup}>
@@ -69,14 +58,14 @@ const styles = StyleSheet.create({
   },
   amountGroup: {
     alignItems: 'flex-end',
-    gap: 4,
+    gap: Spacing.xs,
   },
   card: {
-    backgroundColor: '#F6F8FB',
+    backgroundColor: BackgroundColors.white,
     borderRadius: 24,
     gap: 0,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: cardInset,
+    paddingVertical: cardBlockInset,
   },
   iconBadge: {
     alignItems: 'center',
@@ -89,55 +78,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     flex: 1,
-    gap: 14,
-    paddingRight: 12,
+    gap: cardBlockInset,
+    paddingRight: sectionInset,
   },
   mainRow: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  labelText: {
+    color: TextColors.brand,
+  },
   metaText: {
-    color: '#506B86',
+    color: Colors.dark.icon,
     fontSize: 14,
     lineHeight: 20,
   },
   negative: {
-    color: '#E46A60',
+    color: Colors.dark.danger,
   },
   positive: {
-    color: '#1FA37A',
+    color: Colors.dark.success,
   },
   pressable: {
-    marginBottom: 10,
-  },
-  photoPreviewRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginTop: 6,
-  },
-  photoPreview: {
-    borderRadius: 10,
-    height: 26,
-    width: 26,
-  },
-  photoCountBadge: {
-    alignItems: 'center',
-    backgroundColor: '#DCE6F2',
-    borderRadius: 10,
-    height: 26,
-    justifyContent: 'center',
-    minWidth: 26,
-    paddingHorizontal: 6,
-  },
-  photoCountText: {
-    color: '#214C79',
-    fontSize: 11,
-    fontWeight: '700',
-    lineHeight: 14,
+    marginBottom: compactGap,
   },
   textGroup: {
     flex: 1,
-    gap: 2,
+    gap: tightGap,
   },
 });

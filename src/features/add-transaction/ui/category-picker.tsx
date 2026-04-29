@@ -2,6 +2,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
 import type { TransactionCategory } from '@/src/entities/transaction';
 
 type CategoryOption = {
@@ -36,7 +37,7 @@ export function CategoryPicker({ categories, value, error, onChange }: CategoryP
                     active ? styles.activeCircle : undefined,
                   ]}>
                   <MaterialIcons
-                    color="#FFFFFF"
+                    color={BackgroundColors.white}
                     name={category.icon as keyof typeof MaterialIcons.glyphMap}
                     size={28}
                   />
@@ -54,29 +55,29 @@ export function CategoryPicker({ categories, value, error, onChange }: CategoryP
 
 const styles = StyleSheet.create({
   activeCircle: {
-    borderColor: '#FFFFFF',
+    borderColor: BackgroundColors.white,
     borderWidth: 3,
-    shadowColor: '#FFFFFF',
+    shadowColor: BackgroundColors.white,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 8,
   },
   container: {
-    gap: 12,
+    gap: Spacing.m - Spacing.xs,
   },
   content: {
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.s,
   },
   error: {
-    color: '#FF9085',
+    color: BackgroundColors.red,
     fontSize: 13,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 14,
+    gap: Spacing.m - Spacing.xs / 2,
     justifyContent: 'space-between',
   },
   iconCircle: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     width: '22%',
   },
   label: {
-    color: '#F5F7FB',
+    color: TextColors.body,
     fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',

@@ -1,3 +1,4 @@
+import { BackgroundColors, TextColors } from '@/constants/theme';
 import { getDayKey } from '@/src/shared/lib/date';
 
 export type TransactionType = 'expense' | 'income';
@@ -11,24 +12,24 @@ type CategoryDefinition = {
 };
 
 export const EXPENSE_CATEGORIES = [
-  { id: 'food', label: 'Food', type: 'expense', icon: 'restaurant', color: '#C23AE0' },
-  { id: 'transport', label: 'Transport', type: 'expense', icon: 'directions-car', color: '#7A4A1A' },
-  { id: 'home', label: 'Home', type: 'expense', icon: 'home', color: '#FDB14B' },
-  { id: 'health', label: 'Health', type: 'expense', icon: 'favorite', color: '#F16D6A' },
-  { id: 'shopping', label: 'Shopping', type: 'expense', icon: 'shopping-cart', color: '#8A68C7' },
-  { id: 'entertainment', label: 'Entertainment', type: 'expense', icon: 'sports-esports', color: '#7ED78C' },
-  { id: 'bills', label: 'Bills', type: 'expense', icon: 'receipt-long', color: '#5D96E6' },
-  { id: 'education', label: 'Education', type: 'expense', icon: 'school', color: '#F3D65C' },
-  { id: 'other-expense', label: 'Other', type: 'expense', icon: 'more-horiz', color: '#5D96E6' },
+  { id: 'food', label: 'Food', type: 'expense', icon: 'restaurant', color: BackgroundColors.violet },
+  { id: 'transport', label: 'Transport', type: 'expense', icon: 'directions-car', color: BackgroundColors.brown },
+  { id: 'home', label: 'Home', type: 'expense', icon: 'home', color: BackgroundColors.orange },
+  { id: 'health', label: 'Health', type: 'expense', icon: 'favorite', color: BackgroundColors.red },
+  { id: 'shopping', label: 'Shopping', type: 'expense', icon: 'shopping-cart', color: BackgroundColors.purpure },
+  { id: 'entertainment', label: 'Entertainment', type: 'expense', icon: 'sports-esports', color: BackgroundColors.green },
+  { id: 'bills', label: 'Bills', type: 'expense', icon: 'receipt-long', color: BackgroundColors.blue },
+  { id: 'education', label: 'Education', type: 'expense', icon: 'school', color: BackgroundColors.yellow },
+  { id: 'other-expense', label: 'Other', type: 'expense', icon: 'more-horiz', color: BackgroundColors.blue },
 ] as const satisfies readonly CategoryDefinition[];
 
 export const INCOME_CATEGORIES = [
-  { id: 'salary', label: 'Salary', type: 'income', icon: 'payments', color: '#61C2B1' },
-  { id: 'freelance', label: 'Freelance', type: 'income', icon: 'work', color: '#E0B84E' },
-  { id: 'gift', label: 'Gift', type: 'income', icon: 'card-giftcard', color: '#F16D6A' },
-  { id: 'refund', label: 'Refund', type: 'income', icon: 'replay', color: '#5D96E6' },
-  { id: 'investment', label: 'Investment', type: 'income', icon: 'trending-up', color: '#8A68C7' },
-  { id: 'other-income', label: 'Other', type: 'income', icon: 'add-circle-outline', color: '#7ED78C' },
+  { id: 'salary', label: 'Salary', type: 'income', icon: 'payments', color: TextColors.secondary },
+  { id: 'freelance', label: 'Freelance', type: 'income', icon: 'work', color: TextColors.tertiary },
+  { id: 'gift', label: 'Gift', type: 'income', icon: 'card-giftcard', color: BackgroundColors.red },
+  { id: 'refund', label: 'Refund', type: 'income', icon: 'replay', color: BackgroundColors.blue },
+  { id: 'investment', label: 'Investment', type: 'income', icon: 'trending-up', color: BackgroundColors.purpure },
+  { id: 'other-income', label: 'Other', type: 'income', icon: 'add-circle-outline', color: BackgroundColors.green },
 ] as const satisfies readonly CategoryDefinition[];
 
 export const TRANSACTION_CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES] as const;
