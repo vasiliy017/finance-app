@@ -24,9 +24,10 @@ export function Button({
   style,
 }: ButtonProps) {
   const tint = useThemeColor({}, 'tint');
-  const background = useThemeColor({ light: '#EEF4F7', dark: '#232B31' }, 'background');
+  const panel = useThemeColor({}, 'panelRaised');
+  const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
-  const danger = '#C0392B';
+  const danger = useThemeColor({}, 'danger');
 
   const variantStyle =
     variant === 'primary'
@@ -35,9 +36,9 @@ export function Button({
         ? { backgroundColor: danger, borderColor: danger }
         : variant === 'ghost'
           ? { backgroundColor: 'transparent', borderColor: 'transparent' }
-          : { backgroundColor: background, borderColor: background };
+          : { backgroundColor: panel, borderColor: border };
 
-  const labelColor = variant === 'primary' || variant === 'danger' ? '#FFFFFF' : text;
+  const labelColor = variant === 'primary' ? '#102844' : variant === 'danger' ? '#FFFFFF' : text;
 
   return (
     <Pressable
@@ -60,23 +61,30 @@ export function Button({
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 24,
     borderWidth: 1,
     flexDirection: 'row',
     gap: 8,
     justifyContent: 'center',
-    minHeight: 50,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    minHeight: 56,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    shadowColor: '#03162B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 8,
   },
   disabled: {
     opacity: 0.5,
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   pressed: {
-    opacity: 0.85,
+    opacity: 0.92,
+    transform: [{ scale: 0.985 }],
   },
 });

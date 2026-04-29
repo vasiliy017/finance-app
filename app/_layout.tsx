@@ -1,24 +1,31 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AppNavigationTheme } from '@/constants/theme';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={AppNavigationTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="transaction" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="transaction"
+          options={{
+            presentation: 'modal',
+            headerStyle: { backgroundColor: AppNavigationTheme.colors.card },
+            headerTintColor: AppNavigationTheme.colors.text,
+            headerShadowVisible: false,
+            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+          }}
+        />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </ThemeProvider>
   );
 }

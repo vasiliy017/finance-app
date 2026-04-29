@@ -1,29 +1,62 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
+import { DarkTheme, type Theme } from '@react-navigation/native';
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const brandBackground = '#0B2E57';
+const brandPanel = '#113B68';
+const brandPanelRaised = '#184676';
+const brandBorder = '#2A5A86';
+const brandText = '#F5F7FB';
+const brandMuted = '#A9C2DD';
+const brandAccent = '#E0B84E';
+const brandAccentSoft = '#61C2B1';
+const brandSuccess = '#7ED2A1';
+const brandDanger = '#FF9085';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: brandText,
+    background: brandBackground,
+    tint: brandAccent,
+    icon: brandMuted,
+    tabIconDefault: '#6F8CAA',
+    tabIconSelected: brandAccent,
+    panel: brandPanel,
+    panelRaised: brandPanelRaised,
+    border: brandBorder,
+    muted: brandMuted,
+    accentSoft: brandAccentSoft,
+    success: brandSuccess,
+    danger: brandDanger,
+    chrome: '#082748',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: brandText,
+    background: brandBackground,
+    tint: brandAccent,
+    icon: brandMuted,
+    tabIconDefault: '#6F8CAA',
+    tabIconSelected: brandAccent,
+    panel: brandPanel,
+    panelRaised: brandPanelRaised,
+    border: brandBorder,
+    muted: brandMuted,
+    accentSoft: brandAccentSoft,
+    success: brandSuccess,
+    danger: brandDanger,
+    chrome: '#082748',
+  },
+};
+
+export const AppNavigationTheme: Theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.dark.tint,
+    background: Colors.dark.background,
+    card: Colors.dark.chrome,
+    text: Colors.dark.text,
+    border: Colors.dark.border,
+    notification: Colors.dark.tint,
   },
 };
 

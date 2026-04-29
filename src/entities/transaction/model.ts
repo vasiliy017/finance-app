@@ -6,27 +6,29 @@ type CategoryDefinition = {
   id: string;
   label: string;
   type: TransactionType;
+  icon: string;
+  color: string;
 };
 
 export const EXPENSE_CATEGORIES = [
-  { id: 'food', label: 'Food', type: 'expense' },
-  { id: 'transport', label: 'Transport', type: 'expense' },
-  { id: 'home', label: 'Home', type: 'expense' },
-  { id: 'health', label: 'Health', type: 'expense' },
-  { id: 'shopping', label: 'Shopping', type: 'expense' },
-  { id: 'entertainment', label: 'Entertainment', type: 'expense' },
-  { id: 'bills', label: 'Bills', type: 'expense' },
-  { id: 'education', label: 'Education', type: 'expense' },
-  { id: 'other-expense', label: 'Other', type: 'expense' },
+  { id: 'food', label: 'Food', type: 'expense', icon: 'restaurant', color: '#C23AE0' },
+  { id: 'transport', label: 'Transport', type: 'expense', icon: 'directions-car', color: '#7A4A1A' },
+  { id: 'home', label: 'Home', type: 'expense', icon: 'home', color: '#FDB14B' },
+  { id: 'health', label: 'Health', type: 'expense', icon: 'favorite', color: '#F16D6A' },
+  { id: 'shopping', label: 'Shopping', type: 'expense', icon: 'shopping-cart', color: '#8A68C7' },
+  { id: 'entertainment', label: 'Entertainment', type: 'expense', icon: 'sports-esports', color: '#7ED78C' },
+  { id: 'bills', label: 'Bills', type: 'expense', icon: 'receipt-long', color: '#5D96E6' },
+  { id: 'education', label: 'Education', type: 'expense', icon: 'school', color: '#F3D65C' },
+  { id: 'other-expense', label: 'Other', type: 'expense', icon: 'more-horiz', color: '#5D96E6' },
 ] as const satisfies readonly CategoryDefinition[];
 
 export const INCOME_CATEGORIES = [
-  { id: 'salary', label: 'Salary', type: 'income' },
-  { id: 'freelance', label: 'Freelance', type: 'income' },
-  { id: 'gift', label: 'Gift', type: 'income' },
-  { id: 'refund', label: 'Refund', type: 'income' },
-  { id: 'investment', label: 'Investment', type: 'income' },
-  { id: 'other-income', label: 'Other', type: 'income' },
+  { id: 'salary', label: 'Salary', type: 'income', icon: 'payments', color: '#61C2B1' },
+  { id: 'freelance', label: 'Freelance', type: 'income', icon: 'work', color: '#E0B84E' },
+  { id: 'gift', label: 'Gift', type: 'income', icon: 'card-giftcard', color: '#F16D6A' },
+  { id: 'refund', label: 'Refund', type: 'income', icon: 'replay', color: '#5D96E6' },
+  { id: 'investment', label: 'Investment', type: 'income', icon: 'trending-up', color: '#8A68C7' },
+  { id: 'other-income', label: 'Other', type: 'income', icon: 'add-circle-outline', color: '#7ED78C' },
 ] as const satisfies readonly CategoryDefinition[];
 
 export const TRANSACTION_CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES] as const;
@@ -40,6 +42,7 @@ export type Transaction = {
   category: TransactionCategory;
   date: number;
   note?: string;
+  photos?: string[];
 };
 
 export type TransactionInput = Omit<Transaction, 'id'>;
@@ -48,6 +51,12 @@ export type TransactionSection = {
   dayKey: string;
   subtotal: number;
   data: Transaction[];
+};
+
+export type CategoryTotal = {
+  category: TransactionCategory;
+  total: number;
+  type: TransactionType;
 };
 
 export type TransactionTotals = {
@@ -62,6 +71,10 @@ export function getCategoriesByType(type: TransactionType) {
 
 export function getCategoryLabel(categoryId: TransactionCategory) {
   return TRANSACTION_CATEGORIES.find((category) => category.id === categoryId)?.label ?? categoryId;
+}
+
+export function getCategoryDefinition(categoryId: TransactionCategory) {
+  return TRANSACTION_CATEGORIES.find((category) => category.id === categoryId);
 }
 
 export function isValidCategoryForType(categoryId: string, type: TransactionType): categoryId is TransactionCategory {
@@ -114,4 +127,32 @@ export function groupTransactionsByDay(transactions: Transaction[]) {
   }
 
   return [...sections.values()];
+}
+
+export function calculateCategoryTotals(
+  transactions: Transaction[],
+  type?: TransactionType
+): CategoryTotal[] {
+  const totals = new Map<TransactionCategory, CategoryTotal>();
+
+  for (const transaction of transactions) {
+    if (type && transaction.type !== type) {
+      continue;
+    }
+
+    const current = totals.get(transaction.category);
+
+    if (current) {
+      current.total += transaction.amount;
+      continue;
+    }
+
+    totals.set(transaction.category, {
+      category: transaction.category,
+      total: transaction.amount,
+      type: transaction.type,
+    });
+  }
+
+  return [...totals.values()].sort((left, right) => right.total - left.total);
 }

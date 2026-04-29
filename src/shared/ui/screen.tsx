@@ -42,9 +42,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    gap: 16,
+    gap: 20,
     paddingHorizontal: 20,
-    paddingBottom: 32,
-    paddingTop: 12,
+    paddingBottom: 40,
+    paddingTop: 18,
   },
 });

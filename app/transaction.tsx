@@ -13,7 +13,7 @@ export default function TransactionScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: mode === 'edit' ? 'Edit transaction' : 'Add transaction' }} />
+      <Stack.Screen options={{ headerShown: false }} />
 
       {!hydrated ? (
         <Screen>

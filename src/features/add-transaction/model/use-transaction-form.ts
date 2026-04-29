@@ -1,3 +1,4 @@
+import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 
@@ -11,6 +12,12 @@ import {
   useTransactionStore,
 } from '@/src/entities/transaction';
 import { formatDateInput, parseDateInput } from '@/src/shared/lib/date';
+import {
+  deletePersistedReceiptPhotosAsync,
+  persistReceiptPhotosAsync,
+} from '@/src/shared/lib/receipt-storage';
+
+const MAX_TRANSACTION_PHOTOS = 3;
 
 export type TransactionFormMode = 'create' | 'edit';
 
@@ -20,6 +27,7 @@ export type TransactionFormValues = {
   category?: TransactionCategory;
   dateInput: string;
   note: string;
+  photos: string[];
 };
 
 type TransactionFormErrors = Partial<Record<'amount' | 'category' | 'dateInput', string>>;
@@ -38,6 +46,7 @@ function createInitialValues(transaction?: Transaction): TransactionFormValues {
       category: undefined,
       dateInput: formatDateInput(Date.now()),
       note: '',
+      photos: [],
     };
   }
 
@@ -47,6 +56,7 @@ function createInitialValues(transaction?: Transaction): TransactionFormValues {
     category: transaction.category,
     dateInput: formatDateInput(transaction.date),
     note: transaction.note ?? '',
+    photos: transaction.photos ?? [],
   };
 }
 
@@ -85,6 +95,7 @@ function buildTransactionInput(values: TransactionFormValues): {
       category: values.category,
       date: parsedDate,
       note: values.note.trim() ? values.note.trim() : undefined,
+      photos: values.photos.length > 0 ? values.photos : undefined,
     },
     errors,
   };
@@ -119,7 +130,7 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
     }
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     setSubmitAttempted(true);
 
     const validation = buildTransactionInput(values);
@@ -129,13 +140,64 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
       return;
     }
 
-    if (mode === 'edit' && transaction) {
-      updateTransaction(transaction.id, validation.data);
-    } else {
-      addTransaction(validation.data);
+    try {
+      const persistedPhotos = await persistReceiptPhotosAsync(validation.data.photos ?? []);
+      const nextTransaction = {
+        ...validation.data,
+        photos: persistedPhotos.length > 0 ? persistedPhotos : undefined,
+      } satisfies TransactionInput;
+
+      if (mode === 'edit' && transaction) {
+        const removedPhotos = (transaction.photos ?? []).filter(
+          (photoUri) => !(nextTransaction.photos ?? []).includes(photoUri)
+        );
+
+        updateTransaction(transaction.id, nextTransaction);
+        await deletePersistedReceiptPhotosAsync(removedPhotos);
+      } else {
+        addTransaction(nextTransaction);
+      }
+
+      onCompleted?.();
+    } catch {
+      Alert.alert('Photo save failed', 'The selected receipt could not be saved locally. Please try again.');
+    }
+  }
+
+  async function handleAddPhoto() {
+    if (values.photos.length >= MAX_TRANSACTION_PHOTOS) {
+      return;
     }
 
-    onCompleted?.();
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        'Photos permission needed',
+        'Allow photo library access to attach receipt images to a transaction.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: false,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      selectionLimit: 1,
+    });
+
+    if (result.canceled || !result.assets[0]?.uri) {
+      return;
+    }
+
+    setField('photos', [...values.photos, result.assets[0].uri]);
+  }
+
+  function handleRemovePhoto(uri: string) {
+    setField(
+      'photos',
+      values.photos.filter((currentUri) => currentUri !== uri)
+    );
   }
 
   function handleDelete() {
@@ -148,7 +210,8 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
+        onPress: async () => {
+          await deletePersistedReceiptPhotosAsync(transaction.photos ?? []);
           deleteTransaction(transaction.id);
           onCompleted?.();
         },
@@ -160,8 +223,10 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
 
   return {
     categories,
+    handleAddPhoto,
     errors,
     handleDelete,
+    handleRemovePhoto,
     handleSubmit,
     isDirty: JSON.stringify(values) !== JSON.stringify(createInitialValues(transaction)),
     isValid,

@@ -1,7 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { useThemeColor } from '@/hooks/use-theme-color';
 import type { TransactionType } from '@/src/entities/transaction';
 
 type TypeSwitchProps = {
@@ -10,12 +9,8 @@ type TypeSwitchProps = {
 };
 
 export function TypeSwitch({ value, onChange }: TypeSwitchProps) {
-  const background = useThemeColor({ light: '#EEF4F7', dark: '#232B31' }, 'background');
-  const tint = useThemeColor({}, 'tint');
-  const text = useThemeColor({}, 'text');
-
   return (
-    <View style={[styles.wrapper, { backgroundColor: background }]}> 
+    <View style={styles.wrapper}>
       {(['expense', 'income'] as const).map((item) => {
         const active = item === value;
 
@@ -23,10 +18,11 @@ export function TypeSwitch({ value, onChange }: TypeSwitchProps) {
           <Pressable
             key={item}
             onPress={() => onChange(item)}
-            style={[styles.option, active ? { backgroundColor: tint } : undefined]}>
-            <ThemedText style={{ color: active ? '#FFFFFF' : text, fontWeight: '600' }}>
-              {item === 'expense' ? 'Expense' : 'Income'}
+            style={styles.option}>
+            <ThemedText style={active ? styles.optionActiveText : styles.optionText}>
+              {item === 'expense' ? 'Expenses' : 'Income'}
             </ThemedText>
+            <View style={[styles.underline, active ? styles.underlineActive : undefined]} />
           </Pressable>
         );
       })}
@@ -37,15 +33,32 @@ export function TypeSwitch({ value, onChange }: TypeSwitchProps) {
 const styles = StyleSheet.create({
   option: {
     alignItems: 'center',
-    borderRadius: 12,
-    flex: 1,
-    justifyContent: 'center',
-    minHeight: 44,
+    gap: 8,
+    paddingBottom: 4,
+  },
+  optionActiveText: {
+    color: '#61C2B1',
+    fontSize: 18,
+    fontWeight: '700',
+    lineHeight: 24,
+  },
+  optionText: {
+    color: '#F5F7FB',
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  underline: {
+    backgroundColor: 'transparent',
+    borderRadius: 999,
+    height: 3,
+    width: 72,
+  },
+  underlineActive: {
+    backgroundColor: '#61C2B1',
   },
   wrapper: {
-    borderRadius: 16,
     flexDirection: 'row',
-    gap: 8,
-    padding: 6,
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
 });

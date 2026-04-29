@@ -12,9 +12,10 @@ type TextFieldProps = TextInputProps & {
 
 export function TextField({ label, error, hint, style, ...props }: TextFieldProps) {
   const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({ light: '#D8E1E8', dark: '#2C363D' }, 'icon');
-  const inputBackground = useThemeColor({ light: '#FFFFFF', dark: '#1A2125' }, 'background');
-  const placeholderColor = useThemeColor({ light: '#7A8793', dark: '#7A8793' }, 'icon');
+  const borderColor = useThemeColor({}, 'border');
+  const inputBackground = useThemeColor({}, 'panelRaised');
+  const placeholderColor = useThemeColor({}, 'muted');
+  const danger = useThemeColor({}, 'danger');
 
   return (
     <View style={styles.container}>
@@ -25,7 +26,7 @@ export function TextField({ label, error, hint, style, ...props }: TextFieldProp
           styles.input,
           {
             backgroundColor: inputBackground,
-            borderColor: error ? '#C0392B' : borderColor,
+            borderColor: error ? danger : borderColor,
             color: textColor,
           },
           style,
@@ -40,24 +41,24 @@ export function TextField({ label, error, hint, style, ...props }: TextFieldProp
 
 const styles = StyleSheet.create({
   container: {
-    gap: 8,
+    gap: 10,
   },
   error: {
-    color: '#C0392B',
+    color: '#FF9085',
     fontSize: 13,
     lineHeight: 18,
   },
   hint: {
     fontSize: 13,
     lineHeight: 18,
-    opacity: 0.7,
+    opacity: 0.72,
   },
   input: {
-    borderRadius: 16,
+    borderRadius: 22,
     borderWidth: 1,
     fontSize: 16,
-    minHeight: 52,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    minHeight: 58,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
   },
 });
