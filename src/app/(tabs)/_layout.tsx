@@ -2,10 +2,10 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { BackgroundColors, Colors, Spacing } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { HapticTab } from '@/app/components/haptic-tab';
+import { IconSymbol } from '@/app/components/ui/icon-symbol';
+import { BackgroundColors, Colors, Spacing } from '@/shared/config';
+import { useColorScheme } from '@/shared/hooks';
 
 const tabBarBorderColor = `${BackgroundColors.lightGray}24`;
 
@@ -48,13 +48,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <IconSymbol size={24} name="list.bullet.rectangle" color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="balance"
-        options={{
-          title: 'Balance',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.pie.fill" color={color} />,
         }}
       />
     </Tabs>

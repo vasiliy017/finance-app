@@ -1,8 +1,8 @@
+import { TRANSACTION_STORAGE_KEY, transactionStorage } from '@/shared/lib/storage';
 import {
-  type TransactionInput,
-  type Transaction,
-} from '@/src/entities/transaction/model';
-import { TRANSACTION_STORAGE_KEY, transactionStorage } from '@/src/shared/lib/storage';
+    type Transaction,
+    type TransactionInput,
+} from './model';
 
 type ZustandModule = typeof import('zustand');
 type ZustandMiddlewareModule = typeof import('zustand/middleware');

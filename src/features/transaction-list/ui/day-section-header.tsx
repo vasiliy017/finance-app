@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Colors, Spacing } from '@/constants/theme';
-import { formatCurrency } from '@/src/shared/lib/currency';
-import { formatDayLabel } from '@/src/shared/lib/date';
+import { Colors, Spacing } from '@/shared/config';
+import { formatCurrency } from '@/shared/lib/currency';
+import { formatDayLabel } from '@/shared/lib/date';
+import { ThemedText } from '@/shared/ui';
 
 type DaySectionHeaderProps = {
   dayKey: string;

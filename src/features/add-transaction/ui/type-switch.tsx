@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Spacing, TextColors } from '@/constants/theme';
-import type { TransactionType } from '@/src/entities/transaction';
+import type { TransactionType } from '@/entities/transaction';
+import { Spacing, TextColors } from '@/shared/config';
+import { ThemedText } from '@/shared/ui';
 
 type TypeSwitchProps = {
   value: TransactionType;

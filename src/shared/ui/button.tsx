@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { BackgroundColors, Spacing, TextColors } from '@/shared/config';
+import { useThemeColor } from '@/shared/hooks';
+import { ThemedText } from './themed-text';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 

@@ -1,9 +1,9 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { Card } from '@/src/shared/ui/card';
+import { Spacing } from '@/shared/config';
+import { useThemeColor } from '@/shared/hooks';
+import { Card } from './card';
+import { ThemedText } from './themed-text';
 
 type LoadingStateProps = {
   label?: string;

@@ -1,9 +1,9 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
-import type { TransactionCategory } from '@/src/entities/transaction';
+import type { TransactionCategory } from '@/entities/transaction';
+import { BackgroundColors, Spacing, TextColors } from '@/shared/config';
+import { ThemedText } from '@/shared/ui';
 
 type CategoryOption = {
   id: TransactionCategory;

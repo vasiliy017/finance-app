@@ -1,1 +1,1 @@
-export * from '@/src/features/add-transaction/ui/transaction-form';
+export * from './ui/transaction-form';

@@ -2,8 +2,8 @@ import type { PropsWithChildren } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 
-import { BackgroundColors, Spacing } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { BackgroundColors, Spacing } from '@/shared/config';
+import { useThemeColor } from '@/shared/hooks';
 
 type CardProps = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;

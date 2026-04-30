@@ -2,17 +2,16 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
-import type { Transaction } from '@/src/entities/transaction';
+import type { Transaction } from '@/entities/transaction';
+import { BackgroundColors, Colors, Spacing, TextColors } from '@/shared/config';
+import { Button, Screen, ThemedText } from '@/shared/ui';
 import {
-  type TransactionFormMode,
-  useTransactionForm,
-} from '@/src/features/add-transaction/model/use-transaction-form';
-import { CategoryPicker } from '@/src/features/add-transaction/ui/category-picker';
-import { DateField } from '@/src/features/add-transaction/ui/date-field';
-import { TypeSwitch } from '@/src/features/add-transaction/ui/type-switch';
-import { Button, Screen } from '@/src/shared/ui';
+    type TransactionFormMode,
+    useTransactionForm,
+} from '../model/use-transaction-form';
+import { CategoryPicker } from './category-picker';
+import { DateField } from './date-field';
+import { TypeSwitch } from './type-switch';
 
 type TransactionFormProps = {
   mode: TransactionFormMode;

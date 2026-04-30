@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
-import { Button } from '@/src/shared/ui/button';
-import { Card } from '@/src/shared/ui/card';
+import { Spacing } from '@/shared/config';
+import { Button } from './button';
+import { Card } from './card';
+import { ThemedText } from './themed-text';
 
 type EmptyStateProps = {
   title: string;

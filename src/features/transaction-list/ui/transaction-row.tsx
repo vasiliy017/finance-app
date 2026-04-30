@@ -1,11 +1,17 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
-import { getCategoryDefinition, type Transaction } from '@/src/entities/transaction';
-import { formatCurrency } from '@/src/shared/lib/currency';
-import { formatTransactionDate } from '@/src/shared/lib/date';
+import { type Transaction } from '@/entities/transaction';
+import {
+    BackgroundColors,
+    Colors,
+    getCategoryDefinition,
+    Spacing,
+    TextColors,
+} from '@/shared/config';
+import { formatCurrency } from '@/shared/lib/currency';
+import { formatTransactionDate } from '@/shared/lib/date';
+import { ThemedText } from '@/shared/ui';
 
 type TransactionRowProps = {
   transaction: Transaction;

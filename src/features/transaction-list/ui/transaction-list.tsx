@@ -1,17 +1,17 @@
 import { useMemo } from 'react';
 import { SectionList, StyleSheet } from 'react-native';
 
-import { Spacing } from '@/constants/theme';
 import {
-  groupTransactionsByDay,
-  selectHydrated,
-  selectTransactions,
-  type Transaction,
-  useTransactionStore,
-} from '@/src/entities/transaction';
-import { DaySectionHeader } from '@/src/features/transaction-list/ui/day-section-header';
-import { TransactionRow } from '@/src/features/transaction-list/ui/transaction-row';
-import { EmptyState, LoadingState } from '@/src/shared/ui';
+    groupTransactionsByDay,
+    selectHydrated,
+    selectTransactions,
+    type Transaction,
+    useTransactionStore,
+} from '@/entities/transaction';
+import { Spacing } from '@/shared/config';
+import { EmptyState, LoadingState } from '@/shared/ui';
+import { DaySectionHeader } from './day-section-header';
+import { TransactionRow } from './transaction-row';
 
 type TransactionListProps = {
   onAddTransaction: () => void;

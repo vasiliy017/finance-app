@@ -4,19 +4,22 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, G } from 'react-native-svg';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Spacing, TextColors } from '@/constants/theme';
 import {
-  calculateCategoryTotals,
-  calculateTransactionTotals,
-  getCategoryDefinition,
-  selectHydrated,
-  selectTransactions,
-  type TransactionType,
-  useTransactionStore,
-} from '@/src/entities/transaction';
-import { formatCurrency } from '@/src/shared/lib/currency';
-import { Card, EmptyState, LoadingState, Screen } from '@/src/shared/ui';
+    calculateCategoryTotals,
+    calculateTransactionTotals,
+    selectHydrated,
+    selectTransactions,
+    type TransactionType,
+    useTransactionStore,
+} from '@/entities/transaction';
+import {
+    BackgroundColors,
+    getCategoryDefinition,
+    Spacing,
+    TextColors,
+} from '@/shared/config';
+import { formatCurrency } from '@/shared/lib/currency';
+import { Card, EmptyState, LoadingState, Screen, ThemedText } from '@/shared/ui';
 
 const PERIOD_LABELS = ['Day', 'Week', 'Month', 'Year', 'Date'] as const;
 const DONUT_SIZE = 184;
@@ -100,7 +103,7 @@ function DashboardDonut({ amountLabel, segments }: { amountLabel: string; segmen
   );
 }
 
-export default function HomeScreen() {
+export function HomeScreen() {
   const hydrated = useTransactionStore(selectHydrated);
   const transactions = useTransactionStore(selectTransactions);
   const [activeType, setActiveType] = useState<TransactionType>('expense');
@@ -156,7 +159,12 @@ export default function HomeScreen() {
               <MaterialIcons color={TextColors.tertiary} name="lightbulb-outline" size={24} />
               <ThemedText type="subtitle">Total</ThemedText>
             </View>
-            <ThemedText adjustsFontSizeToFit minimumFontScale={0.75} numberOfLines={1} type="title" style={styles.totalAmount}>
+            <ThemedText
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+              numberOfLines={1}
+              type="title"
+              style={styles.totalAmount}>
               {formatCurrency(totals.balance)}
             </ThemedText>
           </View>
@@ -165,7 +173,6 @@ export default function HomeScreen() {
             <MaterialIcons color={TextColors.body} name="receipt-long" size={26} />
           </Pressable>
         </View>
-
       </View>
 
       <View style={styles.typeTabs}>
@@ -227,7 +234,11 @@ export default function HomeScreen() {
               <View key={item.category} style={styles.summaryRowCard}>
                 <View style={styles.categoryRow}>
                   <View style={styles.categoryLeading}>
-                    <View style={[styles.categoryBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}> 
+                    <View
+                      style={[
+                        styles.categoryBadge,
+                        { backgroundColor: category?.color ?? BackgroundColors.blue },
+                      ]}>
                       <MaterialIcons
                         color={BackgroundColors.white}
                         name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'}
@@ -247,7 +258,6 @@ export default function HomeScreen() {
           })}
         </View>
       ) : null}
-
     </Screen>
   );
 }
@@ -299,12 +309,17 @@ const styles = StyleSheet.create({
   },
   chartCenter: {
     alignItems: 'center',
-    backgroundColor: BackgroundColors.window,
-    borderRadius: 68,
-    height: 136,
     justifyContent: 'center',
-    position: 'absolute',
+    backgroundColor: BackgroundColors.window,
+    borderRadius: '50%',
     width: 136,
+    height: 136,
+    margin: 'auto',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   chartValue: {
     color: TextColors.tertiary,

@@ -1,12 +1,11 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
-import { TransactionList } from '@/src/features/transaction-list';
-import { Button, Screen } from '@/src/shared/ui';
+import { TransactionList } from '@/features/transaction-list';
+import { Spacing } from '@/shared/config';
+import { Button, Screen, ThemedText } from '@/shared/ui';
 
-export default function TransactionsScreen() {
+export function TransactionsScreen() {
   return (
     <Screen scroll={false} style={styles.screen}>
       <View style={styles.headerRow}>

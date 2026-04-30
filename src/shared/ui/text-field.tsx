@@ -1,9 +1,9 @@
 import type { TextInputProps } from 'react-native';
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Spacing } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Spacing } from '@/shared/config';
+import { useThemeColor } from '@/shared/hooks';
+import { ThemedText } from './themed-text';
 
 type TextFieldProps = TextInputProps & {
   label: string;

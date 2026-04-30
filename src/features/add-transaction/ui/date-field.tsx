@@ -3,9 +3,9 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { BackgroundColors, Colors, Spacing, TextColors } from '@/constants/theme';
-import { formatDateInput, parseDateInput } from '@/src/shared/lib/date';
+import { BackgroundColors, Colors, Spacing, TextColors } from '@/shared/config';
+import { formatDateInput, parseDateInput } from '@/shared/lib/date';
+import { ThemedText } from '@/shared/ui';
 
 type DateFieldProps = {
   value: string;

@@ -3,8 +3,8 @@ import type { ScrollViewProps, StyleProp, ViewStyle } from 'react-native';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Spacing } from '@/constants/theme';
-import { useThemeColor } from '@/hooks/use-theme-color';
+import { Spacing } from '@/shared/config';
+import { useThemeColor } from '@/shared/hooks';
 
 type ScreenProps = PropsWithChildren<{
   scroll?: boolean;

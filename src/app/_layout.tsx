@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { AppNavigationTheme } from '@/constants/theme';
+import { AppNavigationTheme } from '@/shared/config';
 
 export const unstable_settings = {
   anchor: '(tabs)',

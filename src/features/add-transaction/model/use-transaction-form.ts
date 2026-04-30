@@ -3,19 +3,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 
 import {
-  getCategoriesByType,
-  isValidCategoryForType,
-  type Transaction,
-  type TransactionCategory,
-  type TransactionInput,
-  type TransactionType,
-  useTransactionStore,
-} from '@/src/entities/transaction';
-import { formatDateInput, parseDateInput } from '@/src/shared/lib/date';
+    type Transaction,
+    type TransactionCategory,
+    type TransactionInput,
+    type TransactionType,
+    useTransactionStore,
+} from '@/entities/transaction';
+import { getCategoriesByType, isValidCategoryForType } from '@/shared/config';
+import { formatDateInput, parseDateInput } from '@/shared/lib/date';
 import {
-  deletePersistedReceiptPhotosAsync,
-  persistReceiptPhotosAsync,
-} from '@/src/shared/lib/receipt-storage';
+    deletePersistedReceiptPhotosAsync,
+    persistReceiptPhotosAsync,
+} from '@/shared/lib/receipt-storage';
 
 const MAX_TRANSACTION_PHOTOS = 3;
 
