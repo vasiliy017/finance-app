@@ -3,14 +3,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { type Transaction } from '@/entities/transaction';
 import {
-    BackgroundColors,
-    Colors,
-    getCategoryDefinition,
-    Spacing,
-    TextColors,
+  BackgroundColors,
+  getCategoryDefinition,
+  Spacing,
+  TextColors,
 } from '@/shared/config';
-import { formatCurrency } from '@/shared/lib/currency';
-import { formatTransactionDate } from '@/shared/lib/date';
+import { formatTransactionTime } from '@/shared/lib/date';
 import { ThemedText } from '@/shared/ui';
 
 type TransactionRowProps = {
@@ -18,99 +16,125 @@ type TransactionRowProps = {
   onPress?: () => void;
 };
 
-const compactGap = Spacing.s - Spacing.xs / 2;
-const cardInset = Spacing.m + Spacing.xs / 2;
-const cardBlockInset = Spacing.m - Spacing.xs / 2;
-const sectionInset = Spacing.m - Spacing.xs;
-const tightGap = Spacing.xs / 2;
+const rowVerticalInset = Spacing.s + Spacing.xs / 2;
+const rowHorizontalInset = Spacing.xs;
 
 export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
   const category = getCategoryDefinition(transaction.category);
-  const amountColor = transaction.type === 'income' ? styles.positive : styles.negative;
+  const amountLabel = transaction.amount.toLocaleString('uk-UA', {
+    maximumFractionDigits: 2,
+  });
 
   return (
     <Pressable onPress={onPress} style={styles.pressable}>
-      <View style={styles.card}>
-        <View style={styles.mainRow}>
-          <View style={styles.leadingGroup}>
-            <View style={[styles.iconBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}>
-              <MaterialIcons color={BackgroundColors.white} name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'} size={22} />
-            </View>
-            <View style={styles.textGroup}>
-              <ThemedText type="defaultSemiBold" style={styles.labelText}>
-                {category?.label ?? transaction.category}
-              </ThemedText>
-              <ThemedText style={styles.metaText}>
-                {transaction.note?.trim() || formatTransactionDate(transaction.date)}
-              </ThemedText>
-            </View>
+      <View style={styles.row}>
+        <View style={styles.leadingGroup}>
+          <View style={[styles.iconBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}>
+            <MaterialIcons
+              color={BackgroundColors.white}
+              name={(category?.icon as keyof typeof MaterialIcons.glyphMap) ?? 'more-horiz'}
+              size={20}
+            />
           </View>
+          <ThemedText numberOfLines={1} style={styles.labelText}>
+            {category?.label ?? transaction.category}
+          </ThemedText>
+        </View>
+        <View style={styles.trailingGroup}>
+          <ThemedText style={styles.timeText}>{formatTransactionTime(transaction.date)}</ThemedText>
           <View style={styles.amountGroup}>
-            <ThemedText style={[styles.amount, amountColor]}>
-              {transaction.type === 'income' ? '+' : '-'}
-              {formatCurrency(transaction.amount)}
+            <ThemedText numberOfLines={1} style={styles.amount}>
+              {amountLabel}
             </ThemedText>
-            <ThemedText style={styles.metaText}>{transaction.type === 'income' ? 'Income' : 'Expense'}</ThemedText>
+            <ThemedText style={styles.currencyText}>₴</ThemedText>
           </View>
         </View>
       </View>
+      {transaction.note?.trim() ? (
+        <View style={styles.noteRow}>
+          <ThemedText numberOfLines={1} style={styles.noteText}>
+            {transaction.note}
+          </ThemedText>
+        </View>
+      ) : null}
+      <View style={styles.divider} />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   amount: {
-    fontWeight: '700',
+    color: BackgroundColors.white,
+    flexShrink: 1,
+    fontSize: 18,
+    lineHeight: 22,
+    textAlign: 'right',
   },
   amountGroup: {
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
     gap: Spacing.xs,
   },
-  card: {
-    backgroundColor: BackgroundColors.white,
-    borderRadius: 24,
-    gap: 0,
-    paddingHorizontal: cardInset,
-    paddingVertical: cardBlockInset,
+  currencyText: {
+    color: BackgroundColors.white,
+    fontSize: 18,
+    lineHeight: 22,
+  },
+  divider: {
+    backgroundColor: 'rgba(251, 252, 253, 0.72)',
+    height: 1,
+    marginTop: rowVerticalInset,
   },
   iconBadge: {
     alignItems: 'center',
-    borderRadius: 22,
-    height: 44,
+    borderRadius: 19,
+    height: 38,
     justifyContent: 'center',
-    width: 44,
+    width: 38,
+  },
+  labelText: {
+    color: BackgroundColors.white,
+    flex: 1,
+    fontSize: 17,
+    lineHeight: 22,
   },
   leadingGroup: {
     alignItems: 'center',
-    flexDirection: 'row',
     flex: 1,
-    gap: cardBlockInset,
-    paddingRight: sectionInset,
-  },
-  mainRow: {
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: Spacing.s + Spacing.xs / 2,
+    minWidth: 0,
+    paddingRight: Spacing.s,
   },
-  labelText: {
-    color: TextColors.brand,
+  noteRow: {
+    paddingLeft: 49,
+    paddingTop: Spacing.xs,
   },
-  metaText: {
-    color: Colors.dark.icon,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  negative: {
-    color: Colors.dark.danger,
-  },
-  positive: {
-    color: Colors.dark.success,
+  noteText: {
+    color: TextColors.body,
+    fontSize: 13,
+    lineHeight: 18,
+    opacity: 0.72,
   },
   pressable: {
-    marginBottom: compactGap,
+    paddingHorizontal: rowHorizontalInset,
+    paddingTop: rowVerticalInset,
   },
-  textGroup: {
-    flex: 1,
-    gap: tightGap,
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  timeText: {
+    color: BackgroundColors.white,
+    fontSize: 16,
+    lineHeight: 20,
+    minWidth: 74,
+    textAlign: 'right',
+  },
+  trailingGroup: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: Spacing.m,
+    justifyContent: 'flex-end',
   },
 });

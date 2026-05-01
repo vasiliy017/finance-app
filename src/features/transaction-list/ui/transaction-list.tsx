@@ -1,37 +1,58 @@
 import { useMemo } from 'react';
-import { SectionList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 
 import {
-    groupTransactionsByDay,
-    selectHydrated,
-    selectTransactions,
-    type Transaction,
-    useTransactionStore,
+  selectHydrated,
+  selectTransactions,
+  type Transaction,
+  type TransactionType,
+  useTransactionStore,
 } from '@/entities/transaction';
 import { Spacing } from '@/shared/config';
+import { getDayKey } from '@/shared/lib/date';
 import { EmptyState, LoadingState } from '@/shared/ui';
-import { DaySectionHeader } from './day-section-header';
 import { TransactionRow } from './transaction-row';
 
 type TransactionListProps = {
   onAddTransaction: () => void;
   onSelectTransaction: (transaction: Transaction) => void;
+  selectedDayKey?: string;
+  typeFilter?: TransactionType;
 };
 
-export function TransactionList({ onAddTransaction, onSelectTransaction }: TransactionListProps) {
+export function TransactionList({
+  onAddTransaction,
+  onSelectTransaction,
+  selectedDayKey,
+  typeFilter,
+}: TransactionListProps) {
   const hydrated = useTransactionStore(selectHydrated);
   const transactions = useTransactionStore(selectTransactions);
-  const sections = useMemo(() => groupTransactionsByDay(transactions), [transactions]);
+  const filteredTransactions = useMemo(
+    () =>
+      transactions.filter((transaction) => {
+        if (typeFilter && transaction.type !== typeFilter) {
+          return false;
+        }
+
+        if (selectedDayKey && getDayKey(transaction.date) !== selectedDayKey) {
+          return false;
+        }
+
+        return true;
+      }),
+    [selectedDayKey, transactions, typeFilter]
+  );
 
   if (!hydrated) {
     return <LoadingState label="Restoring your transaction history..." />;
   }
 
-  if (sections.length === 0) {
+  if (filteredTransactions.length === 0) {
     return (
       <EmptyState
         actionLabel="Add transaction"
-        description="Track your first income or expense to start building your history."
+        description="Add a transaction for this view to populate the list."
         onAction={onAddTransaction}
         title="No transactions yet"
       />
@@ -39,25 +60,21 @@ export function TransactionList({ onAddTransaction, onSelectTransaction }: Trans
   }
 
   return (
-    <SectionList
+    <FlatList
       contentContainerStyle={styles.content}
+      data={filteredTransactions}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TransactionRow transaction={item} onPress={() => onSelectTransaction(item)} />
       )}
-      renderSectionHeader={({ section }) => (
-        <DaySectionHeader dayKey={section.dayKey} subtotal={section.subtotal} />
-      )}
-      sections={sections}
       style={styles.list}
-      stickySectionHeadersEnabled={false}
     />
   );
 }
 
 const styles = StyleSheet.create({
   content: {
-    paddingBottom: Spacing.m - Spacing.xs,
+    paddingBottom: Spacing.xl,
   },
   list: {
     flex: 1,
