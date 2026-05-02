@@ -1,13 +1,18 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import type { Transaction } from '@/entities/transaction';
 import { BackgroundColors, Colors, Spacing, TextColors } from '@/shared/config';
 import { Button, Screen, ThemedText } from '@/shared/ui';
 import {
-    type TransactionFormMode,
-    useTransactionForm,
+  clearPendingCategorySelection,
+  usePendingCategorySelection,
+} from '../model/category-selection';
+import {
+  type TransactionFormMode,
+  useTransactionForm,
 } from '../model/use-transaction-form';
 import { CategoryPicker } from './category-picker';
 import { DateField } from './date-field';
@@ -24,7 +29,6 @@ const compactGap = Spacing.s - Spacing.xs / 2;
 const fieldGap = Spacing.s + Spacing.xs / 2;
 const horizontalInset = Spacing.m + Spacing.xs / 2;
 const sectionGap = Spacing.l - Spacing.xs / 2;
-const verticalInset = Spacing.m - Spacing.xs / 2;
 
 export function TransactionForm({ mode, transaction, onCancel, onCompleted }: TransactionFormProps) {
   const {
@@ -39,18 +43,35 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
     values,
   } =
     useTransactionForm({ mode, onCompleted, transaction });
+  const pendingCategorySelection = usePendingCategorySelection();
 
   const emptySlots = Math.max(0, 3 - values.photos.length);
 
+  useEffect(() => {
+    if (!pendingCategorySelection) {
+      return;
+    }
+
+    if (values.type !== pendingCategorySelection.type) {
+      setField('type', pendingCategorySelection.type);
+    }
+
+    if (values.category !== pendingCategorySelection.category) {
+      setField('category', pendingCategorySelection.category);
+    }
+
+    clearPendingCategorySelection();
+  }, [pendingCategorySelection, setField, values.category, values.type]);
+
   return (
     <Screen contentContainerStyle={styles.content}>
-      <View style={styles.topRow}>
+      <View style={styles.topBar}>
         <Pressable accessibilityRole="button" onPress={onCancel} style={styles.backButton}>
-          <MaterialIcons color={TextColors.brand} name="arrow-back-ios-new" size={20} />
+          <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
         </Pressable>
 
-        <View style={styles.titlePill}>
-          <ThemedText style={styles.titleText}>
+        <View style={styles.titleWrap}>
+          <ThemedText numberOfLines={1} style={styles.titleText}>
             {mode === 'edit' ? 'Edit transaction' : 'Add transactions'}
           </ThemedText>
         </View>
@@ -77,11 +98,12 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
         categories={categories}
         error={errors.category}
         onChange={(value) => setField('category', value)}
+        type={values.type}
         value={values.category}
       />
 
       <View style={styles.fieldGroup}>
-        <ThemedText type="defaultSemiBold">Date</ThemedText>
+        <ThemedText style={styles.sectionTitle}>Date</ThemedText>
         <DateField
           error={errors.dateInput}
           onChange={(value) => setField('dateInput', value)}
@@ -90,7 +112,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
       </View>
 
       <View style={styles.fieldGroup}>
-        <ThemedText type="defaultSemiBold">Comment</ThemedText>
+        <ThemedText style={styles.sectionTitle}>Comment</ThemedText>
         <TextInput
           onChangeText={(value) => setField('note', value)}
           placeholder="Dentistry"
@@ -101,7 +123,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
       </View>
 
       <View style={styles.fieldGroup}>
-        <ThemedText type="defaultSemiBold">Photo</ThemedText>
+        <ThemedText style={styles.sectionTitle}>Photo</ThemedText>
         <View style={styles.photoGrid}>
           {values.photos.map((photoUri) => (
             <View key={photoUri} style={[styles.photoTile, styles.photoTileFilled]}>
@@ -120,12 +142,17 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
         </View>
       </View>
 
-      <Button
+      <Pressable
+        accessibilityRole="button"
         disabled={!isValid}
-        label={mode === 'edit' ? 'Save' : 'Add'}
         onPress={handleSubmit}
-        style={styles.submitButton}
-      />
+        style={({ pressed }) => [
+          styles.submitButton,
+          !isValid && styles.submitButtonDisabled,
+          pressed && isValid && styles.submitButtonPressed,
+        ]}>
+        <ThemedText style={styles.submitLabel}>{mode === 'edit' ? 'Save' : 'Add'}</ThemedText>
+      </Pressable>
 
       {mode === 'edit' ? (
         <Button label="Delete transaction" onPress={handleDelete} variant="danger" />
@@ -138,13 +165,13 @@ const styles = StyleSheet.create({
   amountField: {
     alignItems: 'center',
     backgroundColor: BackgroundColors.window,
-    borderRadius: 22,
+    borderRadius: 18,
     flexDirection: 'row',
     gap: compactGap,
     justifyContent: 'center',
-    minHeight: 84,
-    paddingHorizontal: horizontalInset,
-    width: 162,
+    minHeight: 48,
+    paddingHorizontal: Spacing.s,
+    width: 160,
   },
   amountFieldError: {
     borderColor: BackgroundColors.red,
@@ -152,38 +179,36 @@ const styles = StyleSheet.create({
   },
   amountInput: {
     color: TextColors.brand,
-    fontSize: 32,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '500',
     minWidth: 72,
     paddingVertical: 0,
     textAlign: 'center',
   },
   amountPrefix: {
     color: TextColors.brand,
-    fontSize: 34,
+    fontSize: 24,
     fontWeight: '700',
-    lineHeight: 40,
+    lineHeight: 28,
   },
   amountSection: {
     alignItems: 'center',
-    gap: Spacing.s,
+    gap: Spacing.s - Spacing.xs / 2,
   },
   backButton: {
     alignItems: 'center',
-    backgroundColor: BackgroundColors.window,
-    borderRadius: 20,
     height: 44,
     justifyContent: 'center',
-    width: 44,
+    width: 36,
   },
   commentInput: {
     backgroundColor: BackgroundColors.window,
-    borderRadius: 20,
+    borderRadius: 16,
     color: TextColors.brand,
-    fontSize: 16,
-    minHeight: 52,
+    fontSize: 15,
+    minHeight: 40,
     paddingHorizontal: Spacing.m,
-    paddingVertical: verticalInset,
+    paddingVertical: Spacing.s + Spacing.xs / 2,
   },
   content: {
     gap: sectionGap,
@@ -200,22 +225,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.m,
     justifyContent: 'space-between',
-    minHeight: 112,
+    minHeight: 104,
   },
   photoImage: {
-    borderRadius: 26,
+    borderRadius: 20,
     height: '100%',
     width: '100%',
   },
   photoTile: {
     alignItems: 'center',
     backgroundColor: BackgroundColors.lightGray,
-    borderRadius: 26,
-    height: 112,
+    borderRadius: 20,
+    height: 96,
     justifyContent: 'center',
     overflow: 'hidden',
     position: 'relative',
-    width: 112,
+    width: 96,
   },
   photoTileFilled: {
     backgroundColor: BackgroundColors.window,
@@ -231,27 +256,55 @@ const styles = StyleSheet.create({
     top: Spacing.s,
     width: 24,
   },
-  submitButton: {
-    alignSelf: 'center',
-    minWidth: 260,
-    width: '72%',
+  sectionTitle: {
+    color: BackgroundColors.white,
+    fontSize: 15,
+    lineHeight: 20,
   },
-  titlePill: {
-    backgroundColor: BackgroundColors.window,
-    borderRadius: 20,
-    flex: 1,
+  submitButton: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: TextColors.tertiary,
+    borderRadius: 999,
     justifyContent: 'center',
-    minHeight: 44,
-    paddingHorizontal: horizontalInset,
+    minHeight: 56,
+    minWidth: 260,
+    shadowColor: BackgroundColors.black,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    width: '74%',
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitButtonPressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.985 }],
+  },
+  submitLabel: {
+    color: BackgroundColors.black,
+    fontSize: 17,
+    fontWeight: '500',
+    lineHeight: 22,
   },
   titleText: {
     color: TextColors.brand,
     fontSize: 16,
     lineHeight: 20,
   },
-  topRow: {
+  titleWrap: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  topBar: {
     alignItems: 'center',
+    backgroundColor: BackgroundColors.window,
+    borderRadius: 18,
     flexDirection: 'row',
-    gap: Spacing.m - Spacing.xs,
+    gap: Spacing.s,
+    minHeight: 44,
+    paddingHorizontal: horizontalInset,
+    paddingVertical: Spacing.s + Spacing.xs / 2,
   },
 });

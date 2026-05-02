@@ -15,6 +15,14 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
+          name="category"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+          }}
+        />
+        <Stack.Screen
           name="transaction"
           options={{
             presentation: 'modal',

@@ -134,22 +134,22 @@ const styles = StyleSheet.create({
   },
   calendarButton: {
     alignItems: 'center',
-    height: 44,
+    height: 40,
     justifyContent: 'center',
-    width: 44,
+    width: 40,
   },
   chip: {
     alignItems: 'center',
     borderRadius: 18,
     justifyContent: 'center',
-    minWidth: 68,
+    minWidth: 64,
     paddingHorizontal: chipInset,
-    paddingVertical: fieldGap,
+    paddingVertical: Spacing.s - Spacing.xs / 2,
   },
   chipText: {
     color: TextColors.secondary,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
     lineHeight: 20,
   },
   container: {

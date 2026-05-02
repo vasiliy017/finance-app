@@ -1,7 +1,8 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { TransactionCategory } from '@/entities/transaction';
+import type { TransactionCategory, TransactionType } from '@/entities/transaction';
 import { BackgroundColors, Spacing, TextColors } from '@/shared/config';
 import { ThemedText } from '@/shared/ui';
 
@@ -17,14 +18,51 @@ type CategoryPickerProps = {
   value?: TransactionCategory;
   error?: string;
   onChange: (value: TransactionCategory) => void;
+  showTitle?: boolean;
+  type: TransactionType;
+  showAll?: boolean;
 };
 
-export function CategoryPicker({ categories, value, error, onChange }: CategoryPickerProps) {
+const COMPACT_CATEGORY_LIMIT = 7;
+
+export function CategoryPicker({
+  categories,
+  value,
+  error,
+  onChange,
+  showTitle = true,
+  type,
+  showAll = false,
+}: CategoryPickerProps) {
+  const overflowCategory =
+    categories.find((category) => category.id.startsWith('other-')) ??
+    ({
+      id: 'other-expense',
+      label: 'Other',
+      icon: 'more-horiz',
+      color: BackgroundColors.blue,
+    } as const);
+  const visibleCategories = showAll
+    ? categories
+    : categories.filter((category) => category.id !== overflowCategory.id).slice(0, COMPACT_CATEGORY_LIMIT);
+  const showOverflow = !showAll && categories.length > visibleCategories.length;
+  const overflowActive = !!value && !visibleCategories.some((category) => category.id === value);
+
+  function openCategoryScreen() {
+    router.push({
+      pathname: '/category',
+      params: {
+        category: value,
+        type,
+      },
+    });
+  }
+
   return (
     <View style={styles.container}>
-      <ThemedText type="defaultSemiBold">Category</ThemedText>
+      {showTitle ? <ThemedText style={styles.title}>Category</ThemedText> : null}
       <View style={styles.grid}>
-        {categories.map((category) => {
+        {visibleCategories.map((category) => {
           const active = category.id === value;
 
           return (
@@ -47,6 +85,26 @@ export function CategoryPicker({ categories, value, error, onChange }: CategoryP
             </Pressable>
           );
         })}
+
+        {showOverflow ? (
+          <Pressable onPress={openCategoryScreen} style={styles.item}>
+            <View style={styles.content}>
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: overflowCategory.color },
+                  overflowActive ? styles.activeCircle : undefined,
+                ]}>
+                <MaterialIcons
+                  color={BackgroundColors.white}
+                  name={overflowCategory.icon as keyof typeof MaterialIcons.glyphMap}
+                  size={28}
+                />
+              </View>
+              <ThemedText style={styles.label}>{overflowCategory.label}</ThemedText>
+            </View>
+          </Pressable>
+        ) : null}
       </View>
       {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}
     </View>
@@ -68,7 +126,7 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    gap: Spacing.s,
+    gap: Spacing.s - Spacing.xs / 2,
   },
   error: {
     color: BackgroundColors.red,
@@ -82,18 +140,23 @@ const styles = StyleSheet.create({
   },
   iconCircle: {
     alignItems: 'center',
-    borderRadius: 32,
-    height: 64,
+    borderRadius: 30,
+    height: 60,
     justifyContent: 'center',
-    width: 64,
+    width: 60,
   },
   item: {
     width: '22%',
   },
   label: {
     color: TextColors.body,
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 13,
+    lineHeight: 17,
     textAlign: 'center',
+  },
+  title: {
+    color: BackgroundColors.white,
+    fontSize: 15,
+    lineHeight: 20,
   },
 });
