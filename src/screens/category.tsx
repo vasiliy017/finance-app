@@ -1,13 +1,17 @@
+import { useFocusEffect } from '@react-navigation/native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { TransactionCategory, TransactionType } from '@/entities/transaction';
-import { setPendingCategorySelection } from '@/features/add-transaction/model/category-selection';
+import {
+  setPendingCategorySelection,
+  usePendingCategorySelection,
+} from '@/features/add-transaction/model/category-selection';
 import { CategoryPicker } from '@/features/add-transaction/ui/category-picker';
 import { TypeSwitch } from '@/features/add-transaction/ui/type-switch';
-import { BackgroundColors, getCategoriesByType, Spacing, TextColors } from '@/shared/config';
+import { BackgroundColors, Spacing, TextColors, useCategoriesByType } from '@/shared/config';
 import { Screen, ThemedText } from '@/shared/ui';
 
 export function CategoryScreen() {
@@ -20,11 +24,29 @@ export function CategoryScreen() {
   const [selectedCategory] = useState<TransactionCategory | undefined>(
     initialCategory as TransactionCategory | undefined
   );
-  const categories = useMemo(() => getCategoriesByType(selectedType), [selectedType]);
+  const pendingCategorySelection = usePendingCategorySelection();
+  const categories = useCategoriesByType(selectedType);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (pendingCategorySelection) {
+        router.back();
+      }
+    }, [pendingCategorySelection])
+  );
 
   function handleSelect(category: TransactionCategory) {
     setPendingCategorySelection({ category, type: selectedType });
     router.back();
+  }
+
+  function handleCreate() {
+    router.push({
+      pathname: '/create-category',
+      params: {
+        type: selectedType,
+      },
+    });
   }
 
   return (
@@ -45,7 +67,9 @@ export function CategoryScreen() {
         <CategoryPicker
           categories={categories}
           onChange={handleSelect}
+          onCreate={handleCreate}
           showAll
+          showCreateTile
           showTitle={false}
           type={selectedType}
           value={selectedCategory}

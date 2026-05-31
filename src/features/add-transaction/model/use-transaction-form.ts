@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 import {
@@ -9,7 +9,7 @@ import {
     type TransactionType,
     useTransactionStore,
 } from '@/entities/transaction';
-import { getCategoriesByType, isValidCategoryForType } from '@/shared/config';
+import { isValidCategoryForType, useCategoriesByType } from '@/shared/config';
 import { formatDateInput, parseDateInput } from '@/shared/lib/date';
 import {
     deletePersistedReceiptPhotosAsync,
@@ -118,7 +118,7 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
     }
   }, [values.category, values.type]);
 
-  const categories = useMemo(() => getCategoriesByType(values.type), [values.type]);
+  const categories = useCategoriesByType(values.type);
 
   function setField<Key extends keyof TransactionFormValues>(field: Key, value: TransactionFormValues[Key]) {
     setValues((current) => ({ ...current, [field]: value }));

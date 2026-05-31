@@ -1,3 +1,10 @@
+import { useMemo } from 'react';
+
+import {
+  selectCustomCategories,
+  useCustomCategoryStore,
+  type CustomCategory,
+} from '@/entities/category';
 import type { TransactionCategory, TransactionType } from '@/entities/transaction';
 import { BackgroundColors, TextColors } from './theme';
 
@@ -32,16 +39,44 @@ export const INCOME_CATEGORIES = [
 
 export const TRANSACTION_CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES] as const;
 
-export function getCategoriesByType(type: TransactionType) {
+function mapCustomCategory(category: CustomCategory): CategoryDefinition {
+  return {
+    color: category.color,
+    icon: category.icon,
+    id: category.id,
+    label: category.label,
+    type: category.type,
+  };
+}
+
+function getBuiltinCategoriesByType(type: TransactionType) {
   return TRANSACTION_CATEGORIES.filter((category) => category.type === type);
 }
 
+function mergeCategoriesByType(type: TransactionType, customCategories: readonly CustomCategory[]) {
+  return [...getBuiltinCategoriesByType(type), ...customCategories.filter((category) => category.type === type).map(mapCustomCategory)];
+}
+
+export function getCustomCategories() {
+  return selectCustomCategories(useCustomCategoryStore.getState()).map(mapCustomCategory);
+}
+
+export function useCategoriesByType(type: TransactionType) {
+  const customCategories = useCustomCategoryStore(selectCustomCategories);
+
+  return useMemo(() => mergeCategoriesByType(type, customCategories), [customCategories, type]);
+}
+
+export function getCategoriesByType(type: TransactionType) {
+  return mergeCategoriesByType(type, selectCustomCategories(useCustomCategoryStore.getState()));
+}
+
 export function getCategoryLabel(categoryId: TransactionCategory) {
-  return TRANSACTION_CATEGORIES.find((category) => category.id === categoryId)?.label ?? categoryId;
+  return getCategoryDefinition(categoryId)?.label ?? categoryId;
 }
 
 export function getCategoryDefinition(categoryId: TransactionCategory) {
-  return TRANSACTION_CATEGORIES.find((category) => category.id === categoryId);
+  return [...TRANSACTION_CATEGORIES, ...getCustomCategories()].find((category) => category.id === categoryId);
 }
 
 export function isValidCategoryForType(categoryId: string, type: TransactionType): categoryId is TransactionCategory {

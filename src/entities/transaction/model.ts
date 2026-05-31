@@ -1,22 +1,7 @@
 import { getDayKey } from '@/shared/lib/date';
 
 export type TransactionType = 'expense' | 'income';
-export type TransactionCategory =
-  | 'food'
-  | 'transport'
-  | 'home'
-  | 'health'
-  | 'shopping'
-  | 'entertainment'
-  | 'bills'
-  | 'education'
-  | 'other-expense'
-  | 'salary'
-  | 'freelance'
-  | 'gift'
-  | 'refund'
-  | 'investment'
-  | 'other-income';
+export type TransactionCategory = string;
 
 export type Transaction = {
   id: string;

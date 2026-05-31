@@ -23,6 +23,14 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="create-category"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+          }}
+        />
+        <Stack.Screen
           name="transaction"
           options={{
             presentation: 'modal',

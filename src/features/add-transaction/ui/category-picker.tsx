@@ -21,6 +21,8 @@ type CategoryPickerProps = {
   showTitle?: boolean;
   type: TransactionType;
   showAll?: boolean;
+  showCreateTile?: boolean;
+  onCreate?: () => void;
 };
 
 const COMPACT_CATEGORY_LIMIT = 7;
@@ -33,6 +35,8 @@ export function CategoryPicker({
   showTitle = true,
   type,
   showAll = false,
+  showCreateTile = false,
+  onCreate,
 }: CategoryPickerProps) {
   const overflowCategory =
     categories.find((category) => category.id.startsWith('other-')) ??
@@ -105,6 +109,17 @@ export function CategoryPicker({
             </View>
           </Pressable>
         ) : null}
+
+        {showAll && showCreateTile && onCreate ? (
+          <Pressable onPress={onCreate} style={styles.item}>
+            <View style={styles.content}>
+              <View style={[styles.iconCircle, styles.createCircle]}>
+                <MaterialIcons color={BackgroundColors.white} name="add" size={28} />
+              </View>
+              <ThemedText style={styles.label}>Create</ThemedText>
+            </View>
+          </Pressable>
+        ) : null}
       </View>
       {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}
     </View>
@@ -127,6 +142,9 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     gap: Spacing.s - Spacing.xs / 2,
+  },
+  createCircle: {
+    backgroundColor: TextColors.tertiary,
   },
   error: {
     color: BackgroundColors.red,
