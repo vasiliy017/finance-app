@@ -1,0 +1,17 @@
+appId: com.faust.financeapp
+---
+# Reusable subflow: add one expense transaction from the home screen.
+# Parameters (set with `env` in caller):
+#   AMOUNT      — dollar amount as plain string, e.g. "42"
+#   CATEGORY_ID — built-in expense category id, e.g. "food"
+- tapOn:
+    id: "home-add-btn"
+- assertVisible: "Add transactions"
+- tapOn:
+    id: "tx-form-amount"
+- inputText: ${AMOUNT}
+- tapOn:
+    id: "category-tile-${CATEGORY_ID}"
+- tapOn:
+    id: "tx-form-submit"
+- assertVisible: "Total"

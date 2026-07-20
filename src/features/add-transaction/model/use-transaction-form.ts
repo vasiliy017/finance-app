@@ -3,20 +3,24 @@ import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 import {
-    type Transaction,
-    type TransactionCategory,
-    type TransactionInput,
-    type TransactionType,
-    useTransactionStore,
+  type Transaction,
+  type TransactionCategory,
+  type TransactionInput,
+  type TransactionType,
+  useTransactionStore,
 } from '@/entities/transaction';
-import { isValidCategoryForType, useCategoriesByType } from '@/shared/config';
+import { isValidCategoryForType, Strings, useCategoriesByType } from '@/shared/config';
+import { logCrash } from '@/shared/lib/crash-logger';
 import { formatDateInput, parseDateInput } from '@/shared/lib/date';
 import {
-    deletePersistedReceiptPhotosAsync,
-    persistReceiptPhotosAsync,
+  deletePersistedReceiptPhotosAsync,
+  persistReceiptPhotosAsync,
+  ReceiptStorageError,
 } from '@/shared/lib/receipt-storage';
 
 const MAX_TRANSACTION_PHOTOS = 3;
+const MAX_TRANSACTION_AMOUNT = 1_000_000_000;
+const FUTURE_DATE_TOLERANCE_MS = 24 * 60 * 60 * 1000;
 
 export type TransactionFormMode = 'create' | 'edit';
 
@@ -72,15 +76,19 @@ function buildTransactionInput(values: TransactionFormValues): {
   const errors: TransactionFormErrors = {};
 
   if (!values.amount.trim() || Number.isNaN(amount) || amount <= 0) {
-    errors.amount = 'Enter a positive amount';
+    errors.amount = Strings.transactionForm.errorAmountPositive;
+  } else if (amount > MAX_TRANSACTION_AMOUNT) {
+    errors.amount = Strings.transactionForm.errorAmountTooLarge;
   }
 
   if (!values.category) {
-    errors.category = 'Select a category';
+    errors.category = Strings.transactionForm.errorCategoryRequired;
   }
 
   if (!parsedDate) {
-    errors.dateInput = 'Use YYYY-MM-DD';
+    errors.dateInput = Strings.transactionForm.errorDateFormat;
+  } else if (parsedDate > Date.now() + FUTURE_DATE_TOLERANCE_MS) {
+    errors.dateInput = Strings.transactionForm.errorDateFuture;
   }
 
   if (Object.keys(errors).length > 0 || !values.category || !parsedDate) {
@@ -107,6 +115,11 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
   const [values, setValues] = useState<TransactionFormValues>(() => createInitialValues(transaction));
   const [errors, setErrors] = useState<TransactionFormErrors>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  // Becomes `true` after a successful submit or delete. We hand this back to
+  // the consumer so the unsaved-changes guard (usePreventRemove) can be
+  // disabled before navigation away — otherwise the guard intercepts the
+  // post-success router.back() and shows a spurious "Discard changes?" alert.
+  const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
     setValues(createInitialValues(transaction));
@@ -152,14 +165,27 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
         );
 
         updateTransaction(transaction.id, nextTransaction);
-        await deletePersistedReceiptPhotosAsync(removedPhotos);
+        // Fire-and-forget; orphan cleanup must never block UX or surface errors
+        // because the source-of-truth update has already succeeded.
+        void deletePersistedReceiptPhotosAsync(removedPhotos);
       } else {
         addTransaction(nextTransaction);
       }
 
-      onCompleted?.();
-    } catch {
-      Alert.alert('Photo save failed', 'The selected receipt could not be saved locally. Please try again.');
+      // Flip completed so the next render disables the unsaved-changes guard;
+      // the consumer effect then fires onCompleted (router.back()).
+      setCompleted(true);
+    } catch (error) {
+      const message =
+        error instanceof ReceiptStorageError
+          ? error.message
+          : Strings.transactionForm.photoSaveFailedGeneric;
+      // Surface to the user, then forward to the crash logger so non-storage
+      // failures (which the user can't act on) still reach telemetry.
+      Alert.alert(Strings.transactionForm.photoSaveFailedTitle, message);
+      if (!(error instanceof ReceiptStorageError)) {
+        logCrash(error, { scope: 'TransactionForm.handleSubmit', extra: { mode } });
+      }
     }
   }
 
@@ -172,8 +198,8 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
 
     if (!permission.granted) {
       Alert.alert(
-        'Photos permission needed',
-        'Allow photo library access to attach receipt images to a transaction.'
+        Strings.transactionForm.permissionTitle,
+        Strings.transactionForm.permissionMessage
       );
       return;
     }
@@ -204,20 +230,31 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
       return;
     }
 
-    Alert.alert('Delete transaction', 'This action cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(Strings.transactionForm.deleteTitle, Strings.transactionForm.deleteMessage, [
+      { text: Strings.common.cancel, style: 'cancel' },
       {
-        text: 'Delete',
+        text: Strings.common.delete,
         style: 'destructive',
         onPress: async () => {
           await deletePersistedReceiptPhotosAsync(transaction.photos ?? []);
           deleteTransaction(transaction.id);
-          onCompleted?.();
+          setCompleted(true);
         },
       },
     ]);
   }
 
+  // After a successful save or delete, defer the consumer callback to an
+  // effect so the guard's `enabled` flag (derived from isDirty) has flushed
+  // to false before router.back() dispatches.
+  useEffect(() => {
+    if (completed) {
+      onCompleted?.();
+    }
+  }, [completed, onCompleted]);
+
+  const isDirty =
+    !completed && JSON.stringify(values) !== JSON.stringify(createInitialValues(transaction));
   const isValid = !!buildTransactionInput(values).data;
 
   return {
@@ -227,7 +264,7 @@ export function useTransactionForm({ mode, transaction, onCompleted }: UseTransa
     handleDelete,
     handleRemovePhoto,
     handleSubmit,
-    isDirty: JSON.stringify(values) !== JSON.stringify(createInitialValues(transaction)),
+    isDirty,
     isValid,
     setField,
     values,

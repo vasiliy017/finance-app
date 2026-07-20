@@ -1,0 +1,22 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Submit button must stay disabled when the form is empty / invalid.
+- runFlow: ../helpers/launch-clean.yaml
+- tapOn:
+    id: "home-add-btn"
+- assertVisible: "Add transactions"
+# Submit without entering anything; tap is a no-op because button is disabled.
+- tapOn:
+    id: "tx-form-submit"
+# We must still be on the form screen — title remains visible.
+- assertVisible: "Add transactions"
+# Enter only an amount, still no category picked -> still disabled.
+- tapOn:
+    id: "tx-form-amount"
+- inputText: "10"
+- tapOn:
+    id: "tx-form-submit"
+- assertVisible: "Add transactions"

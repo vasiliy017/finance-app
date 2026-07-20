@@ -9,9 +9,11 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.faust.financeapp"
     },
     "android": {
+      "package": "com.faust.financeapp",
       "adaptiveIcon": {
         "backgroundColor": "#0B2E57",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

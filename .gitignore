@@ -41,3 +41,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Maestro E2E
+.maestro/.maestro/
+maestro-*.png

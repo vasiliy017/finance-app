@@ -1,13 +1,14 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { selectAddCustomCategory, useCustomCategoryStore } from '@/entities/category';
-import type { TransactionType } from '@/entities/transaction';
+import type { CustomCategoryId, TransactionType } from '@/entities/transaction';
 import { setPendingCategorySelection } from '@/features/add-transaction/model/category-selection';
 import { TypeSwitch } from '@/features/add-transaction/ui/type-switch';
-import { BackgroundColors, Colors, Spacing, TextColors, useCategoriesByType } from '@/shared/config';
+import { BackgroundColors, CategoryPalette, CategoryPaletteExtended, Colors, CUSTOM_CATEGORY_ID_PREFIX, Spacing, Strings, TextColors, useCategoriesByType } from '@/shared/config';
+import { useTypedSearchParams } from '@/shared/hooks';
 import { Screen, ThemedText } from '@/shared/ui';
 
 const ICON_OPTIONS = {
@@ -72,28 +73,9 @@ const ICON_LABELS: Record<keyof typeof MaterialIcons.glyphMap, string> = {
   'add-circle-outline': 'Other',
 };
 
-const COLOR_OPTIONS = [
-  BackgroundColors.lightGray,
-  BackgroundColors.blue,
-  BackgroundColors.pink,
-  BackgroundColors.purpure,
-  BackgroundColors.orange,
-  BackgroundColors.darkGreen,
-  BackgroundColors.darkBlue,
-  BackgroundColors.yellow,
-  BackgroundColors.orange,
-] as const;
+const COLOR_OPTIONS = CategoryPalette;
 
-const CUSTOM_COLOR_OPTIONS = [
-  '#5999E2',
-  '#FE3FA8',
-  '#8E6AC8',
-  '#D88239',
-  '#1F8C34',
-  '#135DB2',
-  '#F0D463',
-  '#FFA953',
-] as const;
+const CUSTOM_COLOR_OPTIONS = CategoryPaletteExtended;
 
 function slugifyCategoryLabel(label: string) {
   return label
@@ -104,13 +86,13 @@ function slugifyCategoryLabel(label: string) {
     .replace(/-{2,}/g, '-');
 }
 
-function buildCustomCategoryId(label: string, type: TransactionType, existingIds: readonly string[]) {
-  const base = slugifyCategoryLabel(label) || 'custom-category';
-  let candidate = `custom-${type}-${base}`;
+function buildCustomCategoryId(label: string, type: TransactionType, existingIds: readonly string[]): CustomCategoryId {
+  const base = slugifyCategoryLabel(label) || 'category';
+  let candidate: CustomCategoryId = `${CUSTOM_CATEGORY_ID_PREFIX}${type}-${base}`;
   let suffix = 2;
 
   while (existingIds.includes(candidate)) {
-    candidate = `custom-${type}-${base}-${suffix}`;
+    candidate = `${CUSTOM_CATEGORY_ID_PREFIX}${type}-${base}-${suffix}`;
     suffix += 1;
   }
 
@@ -118,8 +100,7 @@ function buildCustomCategoryId(label: string, type: TransactionType, existingIds
 }
 
 export function CreateCategoryScreen() {
-  const params = useLocalSearchParams<{ type?: string | string[] }>();
-  const initialType = Array.isArray(params.type) ? params.type[0] : params.type;
+  const { type: initialType } = useTypedSearchParams(['type'] as const);
   const [selectedType, setSelectedType] = useState<TransactionType>(
     initialType === 'income' ? 'income' : 'expense'
   );
@@ -152,12 +133,12 @@ export function CreateCategoryScreen() {
 
   function handleSubmit() {
     if (!normalizedLabel) {
-      setError('Enter a category name');
+      setError(Strings.category.errorNameRequired);
       return;
     }
 
     if (labelTaken) {
-      setError('A category with this name already exists');
+      setError(Strings.category.errorNameTaken);
       return;
     }
 
@@ -182,10 +163,15 @@ export function CreateCategoryScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <Screen scroll={false} style={styles.screen}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.topBar}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          onPress={() => router.back()}
+          style={styles.topBar}
+        >
           <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
           <ThemedText type="defaultSemiBold" style={styles.topBarTitle}>
-            Create category
+            {Strings.category.createTitle}
           </ThemedText>
         </Pressable>
 

@@ -1,0 +1,17 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Navigate Home -> full transactions list -> back to Home.
+- runFlow: ../helpers/launch-clean.yaml
+- runFlow:
+    file: ../helpers/add-expense.yaml
+    env:
+      AMOUNT: "12"
+      CATEGORY_ID: "food"
+- tapOn:
+    id: "home-open-list"
+- assertVisible: "Food"
+- back
+- assertVisible: "Total"

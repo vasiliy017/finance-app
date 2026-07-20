@@ -1,0 +1,7 @@
+appId: com.faust.financeapp
+---
+# Reusable subflow: cold-launch the app with cleared state.
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- assertVisible: "Total"

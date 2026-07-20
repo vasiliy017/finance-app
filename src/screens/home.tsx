@@ -14,6 +14,7 @@ import {
 } from '@/entities/transaction';
 import {
     BackgroundColors,
+    ChartPalette,
     getCategoryDefinition,
     Spacing,
     TextColors,
@@ -26,13 +27,6 @@ const DONUT_SIZE = 184;
 const DONUT_STROKE = 22;
 const DONUT_RADIUS = (DONUT_SIZE - DONUT_STROKE) / 2;
 const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
-const CHART_PALETTE = [
-  BackgroundColors.purpure,
-  BackgroundColors.red,
-  BackgroundColors.yellow,
-  BackgroundColors.brown,
-  BackgroundColors.blue,
-] as const;
 const DONUT_TRACK_COLOR = BackgroundColors.lightGray;
 const compactGap = Spacing.s - Spacing.xs / 2;
 const fieldGap = Spacing.s + Spacing.xs / 2;
@@ -117,7 +111,7 @@ export function HomeScreen() {
   const chartSegments = useMemo(
     () => {
       const topSegments = categoryTotals.map((item, index) => ({
-        color: CHART_PALETTE[index] ?? getCategoryDefinition(item.category)?.color ?? BackgroundColors.blue,
+        color: ChartPalette[index] ?? getCategoryDefinition(item.category)?.color ?? BackgroundColors.blue,
         value: item.total,
       }));
       const remainingTotal = allCategoryTotals
@@ -126,7 +120,7 @@ export function HomeScreen() {
 
       if (remainingTotal > 0) {
         topSegments.push({
-          color: CHART_PALETTE[topSegments.length] ?? BackgroundColors.blue,
+          color: ChartPalette[topSegments.length] ?? BackgroundColors.blue,
           value: remainingTotal,
         });
       }
@@ -169,19 +163,37 @@ export function HomeScreen() {
             </ThemedText>
           </View>
 
-          <Pressable accessibilityRole="button" onPress={openTransactions} style={styles.headerIconButton}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open transactions list"
+            onPress={openTransactions}
+            style={styles.headerIconButton}
+            testID="home-open-list"
+          >
             <MaterialIcons color={TextColors.body} name="receipt-long" size={26} />
           </Pressable>
         </View>
       </View>
 
       <View style={styles.typeTabs}>
-        <Pressable onPress={() => setActiveType('expense')} style={styles.typeTab}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Show expenses"
+          accessibilityState={{ selected: activeType === 'expense' }}
+          onPress={() => setActiveType('expense')}
+          style={styles.typeTab}
+        >
           <ThemedText style={activeType === 'expense' ? styles.typeTabActive : styles.typeTabIdle}>
             Expenses
           </ThemedText>
         </Pressable>
-        <Pressable onPress={() => setActiveType('income')} style={styles.typeTab}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Show income"
+          accessibilityState={{ selected: activeType === 'income' }}
+          onPress={() => setActiveType('income')}
+          style={styles.typeTab}
+        >
           <ThemedText style={activeType === 'income' ? styles.typeTabActive : styles.typeTabIdle}>
             Income
           </ThemedText>
@@ -220,7 +232,13 @@ export function HomeScreen() {
           />
         ) : null}
 
-        <Pressable accessibilityRole="button" onPress={openCreateTransaction} style={styles.floatingAddButton}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Add transaction"
+          onPress={openCreateTransaction}
+          style={styles.floatingAddButton}
+          testID="home-add-btn"
+        >
           <MaterialIcons color={BackgroundColors.white} name="add" size={28} />
         </Pressable>
       </Card>

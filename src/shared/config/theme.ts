@@ -45,6 +45,41 @@ export const Spacing = {
   xxl: 48,
 } as const;
 
+/**
+ * Palettes for category visuals. Single source of truth — UI surfaces must
+ * import from here rather than defining ad-hoc color arrays so a theme
+ * change updates every consumer (custom category picker, chart segments, …).
+ */
+export const CategoryPalette = [
+  BackgroundColors.lightGray,
+  BackgroundColors.blue,
+  BackgroundColors.pink,
+  BackgroundColors.purpure,
+  BackgroundColors.orange,
+  BackgroundColors.darkGreen,
+  BackgroundColors.darkBlue,
+  BackgroundColors.yellow,
+] as const;
+
+export const CategoryPaletteExtended = [
+  BackgroundColors.blue,
+  BackgroundColors.pink,
+  BackgroundColors.lightPurpure,
+  BackgroundColors.darkOrange,
+  BackgroundColors.darkGreen,
+  BackgroundColors.darkBlue,
+  BackgroundColors.yellow,
+  BackgroundColors.orange,
+] as const;
+
+export const ChartPalette = [
+  BackgroundColors.purpure,
+  BackgroundColors.red,
+  BackgroundColors.yellow,
+  BackgroundColors.brown,
+  BackgroundColors.blue,
+] as const;
+
 const brandBackground = BackgroundColors.bg;
 const brandPanel = TextColors.brand;
 const brandPanelRaised = BackgroundColors.darkBlue;

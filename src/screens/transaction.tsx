@@ -1,12 +1,12 @@
-import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { Stack, router } from 'expo-router';
 
 import { selectHydrated, selectTransactionById, useTransactionStore } from '@/entities/transaction';
 import { TransactionForm } from '@/features/add-transaction';
+import { useTypedSearchParams } from '@/shared/hooks';
 import { EmptyState, LoadingState, Screen } from '@/shared/ui';
 
 export function TransactionScreen() {
-  const params = useLocalSearchParams<{ id?: string | string[] }>();
-  const transactionId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { id: transactionId } = useTypedSearchParams(['id'] as const);
   const hydrated = useTransactionStore(selectHydrated);
   const transaction = useTransactionStore(selectTransactionById(transactionId));
   const mode = transactionId ? 'edit' : 'create';

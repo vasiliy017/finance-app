@@ -1,7 +1,7 @@
-import { TRANSACTION_STORAGE_KEY, transactionStorage } from '@/shared/lib/storage';
+import { createSafeStorage, TRANSACTION_STORAGE_KEY } from '@/shared/lib/storage';
 import {
-    type Transaction,
-    type TransactionInput,
+  type Transaction,
+  type TransactionInput,
 } from './model';
 
 type ZustandModule = typeof import('zustand');
@@ -21,8 +21,35 @@ type TransactionStore = {
   deleteTransaction: (id: string) => void;
 };
 
+type PersistedTransactionState = { transactions: Transaction[] };
+
+function isPersistedTransactionState(value: unknown): value is PersistedTransactionState {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = (value as { transactions?: unknown }).transactions;
+  return Array.isArray(candidate) && candidate.every(isTransaction);
+}
+
+function isTransaction(value: unknown): value is Transaction {
+  if (!value || typeof value !== 'object') return false;
+  const t = value as Record<string, unknown>;
+  return (
+    typeof t.id === 'string' &&
+    typeof t.amount === 'number' &&
+    (t.type === 'income' || t.type === 'expense') &&
+    typeof t.category === 'string' &&
+    typeof t.date === 'number'
+  );
+}
+
 function createTransactionId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const cryptoRef = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
+  if (cryptoRef?.randomUUID) {
+    return cryptoRef.randomUUID();
+  }
+  // Fallback: 122-bit random ID with timestamp prefix to avoid ever-colliding
+  // even on legacy runtimes without crypto.randomUUID.
+  const random = `${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
+  return `${Date.now().toString(36)}-${random}`;
 }
 
 export const useTransactionStore = create<TransactionStore>()(
@@ -55,9 +82,12 @@ export const useTransactionStore = create<TransactionStore>()(
     }),
     {
       name: TRANSACTION_STORAGE_KEY,
-      storage: transactionStorage,
+      storage: createSafeStorage(isPersistedTransactionState),
       partialize: (state) => ({ transactions: state.transactions }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.warn('[transaction-store] rehydrate error', error);
+        }
         state?.setHydrated(true);
       },
     }

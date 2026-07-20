@@ -7,7 +7,38 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint src"
+    "lint": "expo lint src",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "e2e": "maestro test .maestro/flows",
+    "e2e:ios": "maestro test .maestro/flows --include-tags=ios",
+    "e2e:android": "maestro test .maestro/flows --include-tags=android",
+    "e2e:record": "maestro studio"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": ["<rootDir>/jest.setup.ts"],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-modules-core|@react-navigation/.*|@react-native-async-storage/.*|react-native-svg))"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/.expo/",
+      "/android/",
+      "/ios/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/app/**",
+      "!src/**/index.ts"
+    ],
+    "clearMocks": true,
+    "resetMocks": false
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -43,9 +74,15 @@
     "zustand": "4.5.7"
   },
   "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.9.0",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "jest": "^29.7.0",
+    "jest-expo": "~54.0.0",
+    "react-test-renderer": "^19.1.0",
     "typescript": "~5.9.2"
   },
   "private": true

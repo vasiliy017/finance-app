@@ -1,0 +1,27 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Seed a transaction, open it, edit amount, verify the new value is shown.
+- runFlow: ../helpers/launch-clean.yaml
+- runFlow:
+    file: ../helpers/add-expense.yaml
+    env:
+      AMOUNT: "15"
+      CATEGORY_ID: "food"
+- assertVisible:
+    text: ".*15.*"
+# Open the recently added row (most recent appears first).
+- tapOn:
+    text: "Food"
+- assertVisible: "Edit transaction"
+# Clear amount and enter a new value.
+- tapOn:
+    id: "tx-form-amount"
+- eraseText: 5
+- inputText: "99"
+- tapOn:
+    id: "tx-form-submit"
+- assertVisible:
+    text: ".*99.*"

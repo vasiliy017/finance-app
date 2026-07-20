@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { AppNavigationTheme } from '@/shared/config';
+import { ErrorBoundary } from '@/shared/ui';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -11,37 +12,39 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={AppNavigationTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="category"
-          options={{
-            presentation: 'modal',
-            headerShown: false,
-            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
-          }}
-        />
-        <Stack.Screen
-          name="create-category"
-          options={{
-            presentation: 'modal',
-            headerShown: false,
-            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
-          }}
-        />
-        <Stack.Screen
-          name="transaction"
-          options={{
-            presentation: 'modal',
-            headerStyle: { backgroundColor: AppNavigationTheme.colors.card },
-            headerTintColor: AppNavigationTheme.colors.text,
-            headerShadowVisible: false,
-            contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
-          }}
-        />
-      </Stack>
-      <StatusBar style="light" />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider value={AppNavigationTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="category"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+              contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+            }}
+          />
+          <Stack.Screen
+            name="create-category"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+              contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+            }}
+          />
+          <Stack.Screen
+            name="transaction"
+            options={{
+              presentation: 'modal',
+              headerStyle: { backgroundColor: AppNavigationTheme.colors.card },
+              headerTintColor: AppNavigationTheme.colors.text,
+              headerShadowVisible: false,
+              contentStyle: { backgroundColor: AppNavigationTheme.colors.background },
+            }}
+          />
+        </Stack>
+        <StatusBar style="light" />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

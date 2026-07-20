@@ -34,7 +34,12 @@ export function TransactionsScreen() {
 
   return (
     <Screen scroll={false} style={styles.screen}>
-      <Pressable onPress={() => router.replace('/')} style={styles.topBar}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Back to home"
+        onPress={() => router.replace('/')}
+        style={styles.topBar}
+      >
         <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
         <ThemedText type="defaultSemiBold" style={styles.topBarTitle}>
           List
@@ -42,14 +47,26 @@ export function TransactionsScreen() {
       </Pressable>
 
       <View style={styles.typeTabs}>
-        <Pressable onPress={() => setSelectedType('expense')} style={styles.typeTabButton}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Show expenses"
+          accessibilityState={{ selected: selectedType === 'expense' }}
+          onPress={() => setSelectedType('expense')}
+          style={styles.typeTabButton}
+        >
           <ThemedText
             type="subtitle"
             style={[styles.typeTabLabel, selectedType === 'expense' && styles.typeTabLabelActive]}>
             Expenses
           </ThemedText>
         </Pressable>
-        <Pressable onPress={() => setSelectedType('income')} style={styles.typeTabButton}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Show income"
+          accessibilityState={{ selected: selectedType === 'income' }}
+          onPress={() => setSelectedType('income')}
+          style={styles.typeTabButton}
+        >
           <ThemedText
             type="subtitle"
             style={[styles.typeTabLabel, selectedType === 'income' && styles.typeTabLabelActive]}>
@@ -74,13 +91,23 @@ export function TransactionsScreen() {
         </View>
 
         <View style={styles.dateNavigator}>
-          <Pressable onPress={() => shiftSelectedDate(-1)} style={styles.dateArrow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Previous day"
+            onPress={() => shiftSelectedDate(-1)}
+            style={styles.dateArrow}
+          >
             <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
           </Pressable>
           <ThemedText type="defaultSemiBold" style={styles.dateLabel}>
             {selectedDateLabel}
           </ThemedText>
-          <Pressable onPress={() => shiftSelectedDate(1)} style={styles.dateArrow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Next day"
+            onPress={() => shiftSelectedDate(1)}
+            style={styles.dateArrow}
+          >
             <MaterialIcons color={TextColors.brand} name="chevron-right" size={28} />
           </Pressable>
         </View>

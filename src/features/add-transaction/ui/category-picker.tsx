@@ -70,7 +70,7 @@ export function CategoryPicker({
           const active = category.id === value;
 
           return (
-            <Pressable key={category.id} onPress={() => onChange(category.id)} style={styles.item}>
+            <Pressable key={category.id} onPress={() => onChange(category.id)} style={styles.item} testID={`category-tile-${category.id}`}>
               <View style={styles.content}>
                 <View
                   style={[

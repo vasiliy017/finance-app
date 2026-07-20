@@ -1,7 +1,7 @@
-import type { TransactionCategory, TransactionType } from '@/entities/transaction';
+import type { CustomCategoryId, TransactionType } from '@/entities/transaction';
 
 export type CustomCategory = {
-  id: TransactionCategory;
+  id: CustomCategoryId;
   label: string;
   type: TransactionType;
   icon: string;

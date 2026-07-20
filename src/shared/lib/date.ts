@@ -1,3 +1,5 @@
+import { LOCALE } from '@/shared/config/i18n';
+
 export function formatDateInput(timestamp: number) {
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -59,7 +61,7 @@ export function formatDayLabel(dayKey: string) {
     return 'Yesterday';
   }
 
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString(LOCALE, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -67,21 +69,21 @@ export function formatDayLabel(dayKey: string) {
 }
 
 export function formatTransactionDate(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString('en-GB', {
+  return new Date(timestamp).toLocaleDateString(LOCALE, {
     day: 'numeric',
     month: 'short',
   });
 }
 
 export function formatTransactionTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString('en-US', {
+  return new Date(timestamp).toLocaleTimeString(LOCALE, {
     hour: 'numeric',
     minute: '2-digit',
   });
 }
 
 export function formatMonthDayLabel(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString('en-GB', {
+  return new Date(timestamp).toLocaleDateString(LOCALE, {
     day: 'numeric',
     month: 'long',
   });

@@ -1,0 +1,4 @@
+appId: com.faust.financeapp
+---
+# Shared workspace config for all flows.
+# Override per-flow with `appId` at the top of the flow file if needed.

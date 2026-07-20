@@ -1,0 +1,13 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Toggle the home Income / Expense tabs and verify totals view switches.
+- runFlow: ../helpers/launch-clean.yaml
+- assertVisible: "Expense"
+- assertVisible: "Income"
+- tapOn: "Income"
+- assertVisible: "Total"
+- tapOn: "Expense"
+- assertVisible: "Total"

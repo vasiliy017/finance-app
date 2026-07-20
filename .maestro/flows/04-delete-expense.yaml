@@ -1,0 +1,24 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Seed a transaction, delete it via the destructive alert, verify empty state.
+- runFlow: ../helpers/launch-clean.yaml
+- runFlow:
+    file: ../helpers/add-expense.yaml
+    env:
+      AMOUNT: "20"
+      CATEGORY_ID: "food"
+- tapOn:
+    text: "Food"
+- assertVisible: "Edit transaction"
+# Trash button in the edit screen header.
+- tapOn:
+    accessibilityLabel: "Delete transaction"
+- assertVisible: "Delete transaction"
+- assertVisible: "This action cannot be undone."
+- tapOn: "Delete"
+# Back on home — row is gone.
+- assertVisible: "Total"
+- assertNotVisible: "Food"

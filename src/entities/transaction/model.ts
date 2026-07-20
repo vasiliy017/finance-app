@@ -1,7 +1,53 @@
 import { getDayKey } from '@/shared/lib/date';
 
 export type TransactionType = 'expense' | 'income';
-export type TransactionCategory = string;
+
+/**
+ * Identifiers for the built-in categories shipped with the app. These are the
+ * literal keys defined in `shared/config/transaction-categories.ts`; keeping
+ * them as a literal union lets TypeScript catch typos at compile time and lets
+ * `getCategoryDefinition` narrow its return type when given a literal.
+ */
+export type BuiltinExpenseCategoryId =
+  | 'food'
+  | 'transport'
+  | 'home'
+  | 'health'
+  | 'shopping'
+  | 'entertainment'
+  | 'bills'
+  | 'education'
+  | 'other-expense';
+
+export type BuiltinIncomeCategoryId =
+  | 'salary'
+  | 'freelance'
+  | 'gift'
+  | 'refund'
+  | 'investment'
+  | 'other-income';
+
+export type BuiltinCategoryId = BuiltinExpenseCategoryId | BuiltinIncomeCategoryId;
+
+/**
+ * Custom (user-defined) categories are always namespaced with the
+ * `custom-` prefix at creation time, so the template-literal type holds
+ * regardless of how many custom categories a user adds.
+ */
+export type CustomCategoryId = `custom-${string}`;
+
+export type TransactionCategory = BuiltinCategoryId | CustomCategoryId;
+
+/**
+ * Unsafe cast for boundary code (URL params, persisted JSON, etc.). Use this
+ * sparingly — if the source value isn't a `TransactionCategory`, downstream
+ * lookups will simply return `undefined` (handled gracefully), so we don't
+ * gate it on a registry lookup here to avoid a circular module dependency
+ * with `shared/config/transaction-categories`.
+ */
+export function asTransactionCategory(value: string): TransactionCategory {
+  return value as TransactionCategory;
+}
 
 export type Transaction = {
   id: string;

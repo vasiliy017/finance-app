@@ -1,0 +1,21 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+---
+# Persistence: add a transaction, kill the app, relaunch WITHOUT clearing state,
+# the transaction must still be present (AsyncStorage-backed Zustand store).
+- runFlow: ../helpers/launch-clean.yaml
+- runFlow:
+    file: ../helpers/add-expense.yaml
+    env:
+      AMOUNT: "77"
+      CATEGORY_ID: "food"
+- assertVisible:
+    text: ".*77.*"
+- stopApp
+- launchApp:
+    clearState: false
+- assertVisible: "Food"
+- assertVisible:
+    text: ".*77.*"

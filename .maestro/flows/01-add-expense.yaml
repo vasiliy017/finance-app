@@ -1,0 +1,16 @@
+appId: com.faust.financeapp
+tags:
+  - ios
+  - android
+  - smoke
+---
+# Happy path: add a single expense from a clean state and verify it appears in the list.
+- runFlow: ../helpers/launch-clean.yaml
+- runFlow:
+    file: ../helpers/add-expense.yaml
+    env:
+      AMOUNT: "42"
+      CATEGORY_ID: "food"
+- assertVisible: "Food"
+- assertVisible:
+    text: ".*42.*"

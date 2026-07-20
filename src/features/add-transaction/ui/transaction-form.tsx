@@ -1,10 +1,11 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { Image } from 'expo-image';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import type { Transaction } from '@/entities/transaction';
-import { BackgroundColors, Colors, Spacing, TextColors } from '@/shared/config';
+import { BackgroundColors, Colors, Spacing, Strings, TextColors } from '@/shared/config';
 import { Button, Screen, ThemedText } from '@/shared/ui';
 import {
   clearPendingCategorySelection,
@@ -38,12 +39,29 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
     handleDelete,
     handleRemovePhoto,
     handleSubmit,
+    isDirty,
     isValid,
     setField,
     values,
   } =
     useTransactionForm({ mode, onCompleted, transaction });
   const pendingCategorySelection = usePendingCategorySelection();
+  const navigation = useNavigation();
+
+  usePreventRemove(isDirty, ({ data }) => {
+    Alert.alert(
+      Strings.transactionForm.discardTitle,
+      Strings.transactionForm.discardMessage,
+      [
+        { text: Strings.common.keepEditing, style: 'cancel' },
+        {
+          text: Strings.common.discard,
+          style: 'destructive',
+          onPress: () => navigation.dispatch(data.action),
+        },
+      ]
+    );
+  });
 
   const emptySlots = Math.max(0, 3 - values.photos.length);
 
@@ -63,16 +81,26 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
     clearPendingCategorySelection();
   }, [pendingCategorySelection, setField, values.category, values.type]);
 
+  // Belt-and-suspenders: if the form unmounts while a pending selection is
+  // still in the module-scoped store (e.g. user kills the flow mid-pick),
+  // clear it so the next form session starts from a clean slate.
+  useEffect(() => () => clearPendingCategorySelection(), []);
+
   return (
     <Screen contentContainerStyle={styles.content}>
       <View style={styles.topBar}>
-        <Pressable accessibilityRole="button" onPress={onCancel} style={styles.backButton}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={Strings.common.cancel}
+          onPress={onCancel}
+          style={styles.backButton}
+        >
           <MaterialIcons color={TextColors.brand} name="chevron-left" size={28} />
         </Pressable>
 
         <View style={styles.titleWrap}>
           <ThemedText numberOfLines={1} style={styles.titleText}>
-            {mode === 'edit' ? 'Edit transaction' : 'Add transactions'}
+            {mode === 'edit' ? Strings.transactionForm.titleEdit : Strings.transactionForm.titleCreate}
           </ThemedText>
         </View>
       </View>
@@ -88,6 +116,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
             placeholder="0"
             placeholderTextColor={Colors.dark.muted}
             style={styles.amountInput}
+            testID="tx-form-amount"
             value={values.amount}
           />
         </View>
@@ -118,6 +147,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
           placeholder="Dentistry"
           placeholderTextColor={Colors.dark.muted}
           style={styles.commentInput}
+          testID="tx-form-note"
           value={values.note}
         />
       </View>
@@ -146,6 +176,7 @@ export function TransactionForm({ mode, transaction, onCancel, onCompleted }: Tr
         accessibilityRole="button"
         disabled={!isValid}
         onPress={handleSubmit}
+        testID="tx-form-submit"
         style={({ pressed }) => [
           styles.submitButton,
           !isValid && styles.submitButtonDisabled,

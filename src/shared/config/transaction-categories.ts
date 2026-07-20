@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import {
-  selectCustomCategories,
-  useCustomCategoryStore,
-  type CustomCategory,
+    selectCustomCategories,
+    useCustomCategoryStore,
+    type CustomCategory,
 } from '@/entities/category';
 import type { TransactionCategory, TransactionType } from '@/entities/transaction';
 import { BackgroundColors, TextColors } from './theme';
@@ -39,6 +39,9 @@ export const INCOME_CATEGORIES = [
 
 export const TRANSACTION_CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES] as const;
 
+/** Prefix every persisted custom category id must carry. Guarantees uniqueness vs built-ins. */
+export const CUSTOM_CATEGORY_ID_PREFIX = 'custom-';
+
 function mapCustomCategory(category: CustomCategory): CategoryDefinition {
   return {
     color: category.color,
@@ -67,18 +70,20 @@ export function useCategoriesByType(type: TransactionType) {
   return useMemo(() => mergeCategoriesByType(type, customCategories), [customCategories, type]);
 }
 
-export function getCategoriesByType(type: TransactionType) {
-  return mergeCategoriesByType(type, selectCustomCategories(useCustomCategoryStore.getState()));
-}
-
 export function getCategoryLabel(categoryId: TransactionCategory) {
   return getCategoryDefinition(categoryId)?.label ?? categoryId;
 }
 
 export function getCategoryDefinition(categoryId: TransactionCategory) {
-  return [...TRANSACTION_CATEGORIES, ...getCustomCategories()].find((category) => category.id === categoryId);
+  // Custom categories take precedence: their ids are always namespaced with
+  // CUSTOM_CATEGORY_ID_PREFIX so they cannot collide with built-ins, but we
+  // still check them first to keep behavior deterministic.
+  const custom = getCustomCategories().find((category) => category.id === categoryId);
+  if (custom) return custom;
+  return TRANSACTION_CATEGORIES.find((category) => category.id === categoryId);
 }
 
 export function isValidCategoryForType(categoryId: string, type: TransactionType): categoryId is TransactionCategory {
-  return getCategoriesByType(type).some((category) => category.id === categoryId);
+  const definition = getCategoryDefinition(categoryId as TransactionCategory);
+  return definition?.type === type;
 }

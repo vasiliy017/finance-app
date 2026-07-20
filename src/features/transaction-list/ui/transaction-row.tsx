@@ -3,10 +3,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { type Transaction } from '@/entities/transaction';
 import {
-  BackgroundColors,
-  getCategoryDefinition,
-  Spacing,
-  TextColors,
+    BackgroundColors,
+    CURRENCY_SYMBOL,
+    getCategoryDefinition,
+    LOCALE,
+    Spacing,
+    TextColors,
 } from '@/shared/config';
 import { formatTransactionTime } from '@/shared/lib/date';
 import { ThemedText } from '@/shared/ui';
@@ -21,12 +23,19 @@ const rowHorizontalInset = Spacing.xs;
 
 export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
   const category = getCategoryDefinition(transaction.category);
-  const amountLabel = transaction.amount.toLocaleString('uk-UA', {
+  const amountLabel = transaction.amount.toLocaleString(LOCALE, {
     maximumFractionDigits: 2,
   });
+  const accessibilityLabel = `${category?.label ?? transaction.category}, ${transaction.type === 'income' ? 'income' : 'expense'} ${amountLabel} ${CURRENCY_SYMBOL}`;
 
   return (
-    <Pressable onPress={onPress} style={styles.pressable}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={styles.pressable}
+      testID={`tx-row-${transaction.id}`}
+    >
       <View style={styles.row}>
         <View style={styles.leadingGroup}>
           <View style={[styles.iconBadge, { backgroundColor: category?.color ?? BackgroundColors.blue }]}>
@@ -46,7 +55,7 @@ export function TransactionRow({ transaction, onPress }: TransactionRowProps) {
             <ThemedText numberOfLines={1} style={styles.amount}>
               {amountLabel}
             </ThemedText>
-            <ThemedText style={styles.currencyText}>₴</ThemedText>
+            <ThemedText style={styles.currencyText}>{CURRENCY_SYMBOL}</ThemedText>
           </View>
         </View>
       </View>
